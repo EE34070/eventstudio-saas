@@ -104,8 +104,14 @@ async def _m001_schema(db: AsyncIOMotorDatabase) -> None:
     await sync_tenant_schema(db)
 
 
+async def _m002_wedding_planner(db: AsyncIOMotorDatabase) -> None:
+    """Collections et index du module wedding_planner pour les sociétés déjà créées."""
+    await sync_tenant_schema(db)
+
+
 MIGRATIONS: list[Migration] = [
     _m001_schema,
+    _m002_wedding_planner,
     # Ajouter les suivantes ici, jamais au milieu : _m002_..., _m003_...
 ]
 

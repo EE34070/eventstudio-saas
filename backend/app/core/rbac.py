@@ -30,7 +30,7 @@ ROLE_PERMISSIONS: dict[Role, set[str]] = {
     Role.MANAGER: {
         "crm:*", "events:*", "quotes:*", "invoicing:*", "catalog:*", "inventory:*",
         "logistics:*", "staff:*", "planning:*", "dj:*", "messaging:*", "communication:*",
-        "purchasing:read", "finance:read",
+        "purchasing:read", "finance:read", "wedding_planner:*",
     },
     Role.SALES: {"crm:*", "events:*", "quotes:*", "catalog:read", "messaging:*", "dj:read"},
     Role.TECHNICIAN: {"events:read", "inventory:*", "logistics:*", "planning:read", "catalog:read"},

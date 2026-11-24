@@ -49,9 +49,23 @@ async def sync_mailboxes(ctx):
     ...
 
 
+async def sync_wedding_forms(ctx):
+    """Questionnaires Google Form des organisations ayant le module wedding_planner et un formulaire connecté."""
+    from app.modules.wedding_planner import forms, service
+
+    router: ClusterRouter = ctx["router"]
+    async for org in router.control.orgs.find({"deleted_at": None, "provisioning": "ready"}):
+        tctx = await system_context(router, org["_id"])
+        if not tctx.entitlements.has_module("wedding_planner") or tctx.entitlements.read_only:
+            continue
+        if (await service.get_settings(tctx)).get("form_id"):
+            await forms.sync(tctx)
+
+
 class WorkerSettings:
     functions = [parse_supplier_quote]
-    cron_jobs = [cron(purge_trash, hour=3, minute=17), cron(sync_mailboxes, minute={0, 10, 20, 30, 40, 50})]
+    cron_jobs = [cron(purge_trash, hour=3, minute=17), cron(sync_mailboxes, minute={0, 10, 20, 30, 40, 50}),
+                 cron(sync_wedding_forms, minute={5, 20, 35, 50})]
     on_startup = startup
     redis_settings = RedisSettings.from_dsn(get_settings().REDIS_URL)
     max_jobs = 10

@@ -44,6 +44,18 @@ class Settings(BaseSettings):
 
     # IA
     ANTHROPIC_API_KEY: str = ""
+    ANTHROPIC_MODEL: str = "claude-sonnet-5-5"
+
+    # URL publique de l'application (liens d'invitation dans les e-mails)
+    APP_URL: str = "http://localhost:5173"
+
+    # E-mails transactionnels (Resend). Sans clé : les e-mails sont journalisés, pas envoyés.
+    RESEND_API_KEY: str = ""
+    MAIL_FROM: str = "EventStudio <no-reply@example.com>"
+
+    # Google Forms (module wedding_planner) : compte de service, JSON complet.
+    # Le formulaire doit être partagé avec l'adresse e-mail du compte de service.
+    GOOGLE_SERVICE_ACCOUNT_JSON: str = ""
 
     # Observabilité
     SENTRY_DSN: str = ""

@@ -20,7 +20,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from .config import get_settings
 
 # Collections de la base plateforme. Elles n'existent JAMAIS dans une base société.
-PLATFORM_COLLECTIONS = {"orgs", "memberships", "users", "plans", "billing_events", "migrations_log"}
+PLATFORM_COLLECTIONS = {"orgs", "memberships", "users", "plans", "billing_events", "migrations_log", "invitations"}
 
 _ORG_ID = re.compile(r"^[a-z0-9_]{3,40}$")
 

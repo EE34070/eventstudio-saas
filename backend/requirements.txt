@@ -11,3 +11,5 @@ stripe>=11
 arq>=0.26
 anthropic>=0.40
 sentry-sdk[fastapi]>=2.14
+httpx>=0.27
+fpdf2>=2.8
