@@ -1,0 +1,22 @@
+name: Tâches planifiées
+# Remplace .emergent/crons.yml hors Emergent. Heures en UTC : 6 h et 9 h à Paris en été, 5 h et 8 h en hiver.
+# Secrets GitHub requis : API_URL (ex. https://api.exclusivity-events.com) et WEBHOOK_CRON_SECRET.
+on:
+  schedule:
+    - cron: "0 4 * * *"
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Appel de la tâche
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          SECRET: ${{ secrets.WEBHOOK_CRON_SECRET }}
+          TASK: ${{ github.event.schedule == '0 7 * * *' && 'reminders' || 'loading' }}
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          curl -fsS -X POST "$API_URL/api/cron/$TASK" -H "Authorization: Bearer $SECRET" \
+            -H "X-Webhook-Id: $RUN_ID" -H "Content-Type: application/json" -d "{\"run_id\":\"$RUN_ID\"}"

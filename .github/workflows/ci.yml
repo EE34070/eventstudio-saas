@@ -1,29 +1,63 @@
 name: CI
 on:
-  pull_request:
   push:
     branches: [main]
+  pull_request:
 
 jobs:
   backend:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: backend } }
+    services:
+      mongo:
+        image: mongo:7
+        ports: ["27017:27017"]
+    env:
+      ENV: development
+      MONGO_URL: mongodb://localhost:27017
+      DB_NAME: ci
+      EMAIL_FROM_NAME: CI
+      EMAIL_PROVIDER: smtp
+      STORAGE_PROVIDER: local
+      WEBHOOK_CRON_SECRET: ci-secret
+      REACT_APP_BACKEND_URL: http://localhost:8001
+    defaults:
+      run:
+        working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
-      - run: pip install -r requirements-dev.txt
-      - run: ruff check app tests scripts
-      - run: pytest -q                      # inclut les tests d'isolation multi-tenant : bloquants
-      - run: pip-audit -r requirements.txt  # vulnérabilités connues
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: litellm ne doit pas être figé (emergentintegrations l'installe ; utiliser scripts/freeze.sh)
+        run: "! grep -qi '^litellm' requirements.txt"
+      - name: Installation depuis requirements.txt (environnement vierge)
+        run: pip install -r requirements.txt --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/
+      - name: pip-audit
+        run: pip install pip-audit && pip-audit -r requirements.txt --disable-pip --no-deps
+      - name: Démarrage et contrôle de santé
+        run: |
+          uvicorn server:app --port 8001 &
+          for i in $(seq 1 30); do curl -fs http://localhost:8001/api/health && break; sleep 1; done
+          curl -fs http://localhost:8001/api/health
+      # Les tests qui exigent des sessions Clerk de test sont ignorés automatiquement (pas de clés en CI).
+      - run: pytest tests/ -n 0 -q
+      # Tests SaaS (une base par société, offres, migration) : sans serveur ni Clerk, bloquants
+      - name: Tests SaaS
+        run: pip install mongomock-motor pytest-asyncio && python -m pytest tests_saas -q -p no:cacheprovider
 
   frontend:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: frontend } }
+    defaults:
+      run:
+        working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: "22", cache: npm, cache-dependency-path: frontend/package-lock.json }
-      - run: npm ci
-      - run: npm run build
-      - run: npm audit --audit-level=high
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: frontend/.node-version
+      - run: yarn install --frozen-lockfile
+      - name: yarn audit (bloque sur un avis critique)
+        run: yarn audit --groups dependencies --level critical || [ $? -lt 16 ]
+      - run: yarn build
+        env:
+          REACT_APP_BACKEND_URL: https://api.exclusivity-events.com

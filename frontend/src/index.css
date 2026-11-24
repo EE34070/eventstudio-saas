@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@700;800&display=swap");
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 0 0% 9%;
+        --card: 0 0% 100%;
+        --card-foreground: 0 0% 9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 0 0% 9%;
+        --primary: 219 100% 50%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 0 0% 96%;
+        --secondary-foreground: 0 0% 9%;
+        --muted: 0 0% 96%;
+        --muted-foreground: 0 0% 32%;
+        --accent: 0 0% 96%;
+        --accent-foreground: 0 0% 9%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 0 0% 90%;
+        --input: 0 0% 90%;
+        --ring: 0 0% 9%;
+        --radius: 0.75rem;
+        --brand-a: #0347FB;
+        --brand-b: #03A9FC;
+        --soft-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --st-l: 0.5;
+    }
+    .dark {
+        --background: 0 0% 4%;
+        --foreground: 0 0% 100%;
+        --card: 0 0% 9%;
+        --card-foreground: 0 0% 100%;
+        --popover: 0 0% 9%;
+        --popover-foreground: 0 0% 100%;
+        --primary: 213 100% 60%;
+        --secondary: 0 0% 14%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 0 0% 14%;
+        --muted-foreground: 0 0% 64%;
+        --accent: 0 0% 15%;
+        --accent-foreground: 0 0% 100%;
+        --border: 0 0% 15%;
+        --input: 0 0% 20%;
+        --ring: 0 0% 83%;
+        --soft-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        --st-l: 0.8;
+    }
+}
+
+@layer base {
+    * { @apply border-border; }
+    body {
+        @apply bg-background text-foreground;
+        font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-feature-settings: "tnum";
+        -webkit-font-smoothing: antialiased;
+        font-size: 14px;
+    }
+    ::selection { background: hsl(var(--primary) / 0.18); }
+    .lucide { stroke-width: 1.5; }
+}
+
+.font-display { font-weight: 700; letter-spacing: -0.02em; }
+.font-brand { font-family: "Outfit", sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+.brand-mark { display: inline-flex; height: 32px; width: 32px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 10px; background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; font-family: "Outfit", sans-serif; font-weight: 800; font-size: 18px; }
+.eyebrow { font-size: 12px; font-weight: 500; color: hsl(0 0% 45%); }
+.dark .eyebrow { color: hsl(0 0% 60%); }
+.shadow-soft { box-shadow: var(--soft-shadow); }
+.card-soft { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 16px; transition: border-color .18s ease; }
+.hover-lift { transition: border-color .18s ease; }
+.hover-lift:hover { border-color: hsl(0 0% 64%); }
+.icon-btn { display: inline-flex; height: 36px; width: 36px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 9999px; position: relative; transition: background-color .15s ease; }
+.icon-btn:hover { background: hsl(var(--secondary)); }
+.pill-input { height: 44px; width: 100%; border-radius: 9999px; border: 1px solid hsl(var(--border)); background: transparent; padding: 0 16px 0 44px; font-size: 14px; outline: none; transition: border-color .15s ease; }
+.pill-input:focus { border-color: hsl(0 0% 64%); }
+
+.st-demande, .dot-demande { --c: 0.10; --h: 240; }
+.st-devis_envoye, .dot-devis_envoye { --c: 0.12; --h: 290; }
+.st-confirme, .dot-confirme { --c: 0.10; --h: 150; }
+.st-en_preparation, .dot-en_preparation { --c: 0.12; --h: 60; }
+.st-realise, .dot-realise { --c: 0.085; --h: 190; }
+.st-facture, .dot-facture { --c: 0.10; --h: 100; }
+.st-cloture, .dot-cloture { --c: 0.01; --h: 60; }
+.st-demande, .st-devis_envoye, .st-confirme, .st-en_preparation, .st-realise, .st-facture, .st-cloture {
+    color: oklch(var(--st-l) var(--c) var(--h));
+    background: oklch(0.6 var(--c) var(--h) / 0.13);
+}
+.dot-demande, .dot-devis_envoye, .dot-confirme, .dot-en_preparation, .dot-realise, .dot-facture, .dot-cloture { background: oklch(0.62 var(--c) var(--h)); }
+
+.fade-up { animation: fadeUp .45s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.scroll-thin::-webkit-scrollbar { height: 8px; width: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 8px; }
+
+.venue-pin { width: 28px; height: 28px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+.venue-pin.active { background: #171717; }
+.leaflet-container { font-family: "Plus Jakarta Sans", sans-serif; z-index: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .05s !important; }
+}

@@ -1,0 +1,367 @@
+{
+  "build_now": "Choose the smallest useful set of features from the user's scope that delivers the fastest aha moment through a complete core workflow, honoring explicit user priorities.",
+  "app_meta": {
+    "name": "Exclusivity Events ERP",
+    "industry": "Vertical Ops & Event Equipment Rental / Event Production Management",
+    "locale": "fr-FR",
+    "currency": "EUR (€)",
+    "date_format": "DD/MM/YYYY",
+    "time_format": "HH:mm",
+    "number_format": "1 234,56 € (espace insécable comme séparateur de milliers, virgule décimale)",
+    "demo_company": "Exclusivity Events",
+    "roles": [
+      { "id": "admin", "label": "Administrateur", "scope": "Gestion complète, configuration modules, droits et intégrations" },
+      { "id": "gerant", "label": "Gérant", "scope": "Pilotage stratégique, CA, alertes critiques, validation devis/factures" },
+      { "id": "commercial", "label": "Commercial", "scope": "Demandes entrantes, CRM contacts, génération et relance des devis" },
+      { "id": "chef_projet", "label": "Chef de projet", "scope": "Coordination globale de l'événement, planning, fiches techniques" },
+      { "id": "technicien", "label": "Technicien", "scope": "Feuille de route, chargement véhicule, check-in/out matériel sur site" },
+      { "id": "comptable", "label": "Comptable", "scope": "Facturation acompte/solde, règlements, impayés, notes de frais" }
+    ],
+    "modules": [
+      { "id": "loueur_materiel", "label": "Loueur de matériel & Prestation audiovisuelle", "is_core": true, "status": "actif" },
+      { "id": "son_lumiere", "label": "Son & Lumière", "is_core": true, "status": "actif" },
+      { "id": "dj", "label": "DJ & Animation musicale", "is_core": true, "status": "actif" },
+      { "id": "photobooth", "label": "Photobooth & Bornes Selfie", "is_core": true, "status": "actif" },
+      { "id": "photographe", "label": "Photographe & Vidéaste", "is_core": true, "status": "actif" },
+      { "id": "wedding_planner", "label": "Wedding Planner & Scénographie", "is_core": true, "status": "actif" },
+      { "id": "agence", "label": "Agence événementielle corporate", "is_core": true, "status": "actif" }
+    ]
+  },
+  "user_context": {
+    "actors": {
+      "primary": "Chef de projet & Commercial événementiel",
+      "supporting": ["Gérant", "Technicien régisseur", "Responsable logistique / parc"]
+    },
+    "triggers": [
+      "Nouvelle demande de prestation via formulaire en ligne, téléphone ou prescripteur",
+      "Évolution de statut : signature de devis déclenchant la réservation de stock et blocage des dates",
+      "Alerte opérationnelle : conflit de disponibilité matériel sur un week-end chargé ou technicien manquant",
+      "Préparation de chargement pour les départs du lendemain"
+    ],
+    "key_decisions": [
+      "Le parc matériel est-il disponible aux dates d'installation et d'exploitation sans créer de surréservation ?",
+      "Quelle marge prévisionnelle et quel acompte exiger selon le profil client et la typologie d'événement ?",
+      "Quels techniciens et véhicules affecter pour garantir le montage dans les fenêtres d'accès de la salle ?"
+    ],
+    "successful_outcome": "Un événement planifié sans conflit logistique, devis validé avec acompte encaissé, feuille de route claire pour l'équipe technique et facturation émise sans oubli."
+  },
+  "workflow_lifecycle": {
+    "stages": [
+      { "key": "demande", "label": "Demande", "description": "Qualification du besoin, date, lieu, budget indicatif", "badge_color": "oklch(0.520 0.100 240)" },
+      { "key": "devis_envoye", "label": "Devis envoyé", "description": "Chiffrage prestations + matériel, en attente signature client", "badge_color": "oklch(0.550 0.120 290)" },
+      { "key": "confirme", "label": "Confirmé", "description": "Acompte reçu ou bon pour accord signé, stock réservé", "badge_color": "oklch(0.520 0.095 150)" },
+      { "key": "en_preparation", "label": "En préparation", "description": "Affectation techniciens, check matériel, préparation palettes", "badge_color": "oklch(0.580 0.120 55)" },
+      { "key": "realise", "label": "Réalisé", "description": "Prestation effectuée le jour J, démontage achevé", "badge_color": "oklch(0.500 0.085 190)" },
+      { "key": "facture", "label": "Facturé", "description": "Facture de solde émise, intégration comptable", "badge_color": "oklch(0.550 0.095 100)" },
+      { "key": "cloture", "label": "Clôturé", "description": "Retour matériel inspecté sans casse, solde payé, archivage", "badge_color": "oklch(0.460 0.020 60)" }
+    ],
+    "ownership_handoffs": [
+      "Commercial → Chef de projet lors du passage de 'Devis envoyé' à 'Confirmé'",
+      "Chef de projet → Technicien régisseur lors du passage à 'En préparation'",
+      "Régisseur → Responsable dépôt au moment du 'Retour matériel'",
+      "Chef de projet → Comptable pour l'émission de la facture finale et clôture"
+    ]
+  },
+  "navigation_architecture": {
+    "structure": "sidebar_collapsible",
+    "rationale": "Un menu latéral gauche repliable (260px déployé, 68px replié) maximise l'espace horizontal sur les écrans d'exploitation (tableaux denses de stock, kanban 7 colonnes, planning calendrier semaine/mois) tout en gardant un accès direct aux modules opérationnels.",
+    "alternative_rejected": "Navigation horizontale haute : rejetée car saturée par 9 rubriques métiers et modules, rognant 80px de hauteur utile sur les plannings chronologiques.",
+    "mobile_adaptation": "En dessous de 1024px, la sidebar se replie en Drawer modal ouvrant depuis la gauche (overlay estompé) avec bouton burger visible dans la Topbar, complété d'une Bottom Bar d'accès rapide (Dashboard, Événements, Planning, Matériel).",
+    "sections": [
+      {
+        "category": "Tableau de bord",
+        "items": [
+          { "id": "dashboard", "label": "Vue d'ensemble", "icon": "LayoutDashboard", "path": "/dashboard", "badge": "Alertes (3)" }
+        ]
+      },
+      {
+        "category": "Opérations",
+        "items": [
+          { "id": "evenements", "label": "Événements", "icon": "CalendarCheck2", "path": "/evenements", "badge": "14" },
+          { "id": "planning", "label": "Planning & Équipe", "icon": "CalendarDays", "path": "/planning" },
+          { "id": "catalogue", "label": "Catalogue & Matériel", "icon": "Boxes", "path": "/catalogue", "badge": "Loueur" },
+          { "id": "chargement", "label": "Chargement & Départs", "icon": "Truck", "path": "/chargement" }
+        ]
+      },
+      {
+        "category": "Administratif",
+        "items": [
+          { "id": "contacts", "label": "Contacts & CRM", "icon": "Users", "path": "/contacts" },
+          { "id": "lieux", "label": "Lieux & Cartographie", "icon": "MapPin", "path": "/lieux" },
+          { "id": "facturation", "label": "Devis & Factures", "icon": "Receipt", "path": "/facturation" }
+        ]
+      },
+      {
+        "category": "Entreprise",
+        "items": [
+          { "id": "parametres", "label": "Modules & Société", "icon": "SlidersHorizontal", "path": "/entreprise" }
+        ]
+      }
+    ]
+  },
+  "views": {
+    "dashboard": {
+      "title": "Tableau de bord de pilotage",
+      "target_users": ["Gérant", "Chef de projet", "Commercial"],
+      "primary_decision": "Quels sont les événements imminents à sécuriser, les conflits de matériel immédiats et les devis à convertir aujourd'hui ?",
+      "kpi_strip": [
+        { "id": "ca_mois", "label": "Chiffre d'Affaires du mois", "value": "48 650 €", "delta": "+14 % vs N-1", "sentiment": "positive" },
+        { "id": "ca_previsionnel", "label": "CA Prévisionnel (T2)", "value": "132 400 €", "delta": "26 événements", "sentiment": "neutral" },
+        { "id": "devis_attente", "label": "Devis en attente", "value": "7 devis", "subtext": "24 800 € à relancer", "sentiment": "warning" },
+        { "id": "factures_impayees", "label": "Factures à encaisser", "value": "11 350 €", "subtext": "3 échues", "sentiment": "negative" }
+      ],
+      "alert_center": {
+        "title": "Alertes critiques d'exploitation",
+        "count": 3,
+        "items": [
+          { "type": "conflit_materiel", "severity": "danger", "title": "Conflit Stock : Pont Alu 290 Trio 3m", "detail": "Requis : 14 unités le 24 Mai. Disponible : 10 unités. Manque : 4 unités (Gala Eden vs Mariage Saint-Germain).", "action_label": "Résoudre en sous-location" },
+          { "type": "maintenance", "severity": "warning", "title": "Entretien planifié : Groupe électrogène 60kVA", "detail": "Révision technique requise avant départ le 22 Mai.", "action_label": "Voir fiche atelier" },
+          { "type": "technicien_non_affecte", "severity": "warning", "title": "Régisseur Son manquant", "detail": "Soirée Corporate Inovatech (20 Mai, 18h-02h) sans technicien affecté.", "action_label": "Affecter un technicien" }
+        ]
+      },
+      "quick_sections": [
+        { "title": "Prochains événements (7 jours)", "display": "cards_compact" },
+        { "title": "Planning de chargement du jour", "display": "checklist_progress" }
+      ]
+    },
+    "evenements": {
+      "title": "Gestion des Événements",
+      "target_users": ["Chef de projet", "Commercial", "Gérant"],
+      "primary_decision": "Où en est chaque événement dans le cycle de production et quel dossier nécessite une action urgente ?",
+      "view_modes": ["kanban", "table"],
+      "default_mode": "kanban",
+      "kanban_lanes": [
+        "Demande", "Devis envoyé", "Confirmé", "En préparation", "Réalisé", "Facturé", "Clôturé"
+      ],
+      "card_anatomy": {
+        "header": "Code événement + Nom client + Type (Mariage, Gala, Soirée Entreprise)",
+        "badge": "Date d'exploitation + Lieu (ville / salle)",
+        "kpis": "Montant TTC, Acompte réglé (barre de progression), Conflit matériel (icône alerte si stock insuffisant)",
+        "footer": "Chef de projet assigné (avatar) + Prochaine tâche + Nombre d'éléments loués"
+      },
+      "search_filters": [
+        "Recherche texte (nom événement, client, numéro dossier)",
+        "Filtre par Module métier (DJ, Son & Lumière, Photobooth, etc.)",
+        "Filtre par plage de dates",
+        "Filtre par Chef de projet"
+      ],
+      "primary_action": "Nouvel événement"
+    },
+    "event_detail": {
+      "title": "Fiche Événement 360°",
+      "target_users": ["Chef de projet", "Technicien", "Commercial", "Comptable"],
+      "banner_summary": {
+        "title": "Nom de l'événement & Client",
+        "status_selector": "Badge interactif de changement d'état avec validation des prérequis",
+        "meta": "Dates de montage / exploitation / démontage, Salle / Lieu avec lien GPS, Chef de projet référent, CA total"
+      },
+      "tabs": [
+        {
+          "id": "infos",
+          "label": "Informations générales",
+          "content": "Coordonnées client, contact régisseur salle, contraintes d'accès (marches, monte-charge, horaires d'accès), feuille de route synthétique."
+        },
+        {
+          "id": "prestations",
+          "label": "Prestations & Services",
+          "content": "Packs de services commandés (Pack Sonorisation Live, Show Lumière Asservi, Forfait DJ & Animation, Borne Photobooth 400 tirages)."
+        },
+        {
+          "id": "materiel",
+          "label": "Matériel & Stock réservé",
+          "content": "Liste détaillée des références louées avec quantité requise, numéro de flight-case/série, statut de disponibilité immédiat, détection temps réel de conflit et bouton sous-location."
+        },
+        {
+          "id": "equipe",
+          "label": "Équipe & Techniciens",
+          "content": "Rôles requis (Régisseur général, Ingénieur son, Éclairagiste, Animateur DJ, Chauffeur-livreur), affectation du personnel, confirmation de présence, notes de frais associées."
+        },
+        {
+          "id": "planning",
+          "label": "Planning d'exploitation",
+          "content": "Chronogramme heure par heure : Chargement camion, Arrivée sur site, Montage, Balance son, Accueil public, Prestation, Démontage et Retour dépôt."
+        },
+        {
+          "id": "documents",
+          "label": "Documents & Fichiers",
+          "content": "Générateur PDF de devis, bon de commande, contrat signé, plan de salle, fiche de sécurité ERP, feuille de route technique."
+        },
+        {
+          "id": "finances",
+          "label": "Finances & Facturation",
+          "content": "Calcul de rentabilité prévisionnelle (CA HT, coûts matériel, cachets techniciens, frais de déplacement, marge nette %), suivi des acomptes (30% à la signature, solde J+1)."
+        }
+      ]
+    },
+    "catalogue_materiel": {
+      "title": "Catalogue & Parc Matériel (Module Loueur)",
+      "target_users": ["Responsable parc", "Chef de projet", "Technicien"],
+      "primary_decision": "Quel est l'état du parc matériel, combien d'exemplaires sont réservés à telle date et quelles pièces nécessitent maintenance ?",
+      "categories": [
+        "Sonorisation (Enceintes, Micros, Tables de mixage, Amplis)",
+        "Éclairage & Effets (Lyres spot/wash, Barres LED, Projecteurs batterie, Machine à fumée lourde)",
+        "Structure & Levage (Ponts alu, Pieds de levage, Élingues)",
+        "Vidéo & Bornes (Photobooth, Écrans LED géants, Vidéoprojecteurs)",
+        "Mobilier & Énergie (Groupes électrogènes, Câblage P17, Praticables de scène)"
+      ],
+      "inventory_columns": [
+        "Référence & Photo",
+        "Désignation",
+        "Catégorie",
+        "Stock Total",
+        "Disponible",
+        "Réservé",
+        "En maintenance",
+        "Tarif Jour HT",
+        "Actions"
+      ],
+      "availability_inspector": "Sélecteur de date pour inspecter la jauge de disponibilité du matériel avec calendrier d'engagement."
+    },
+    "planning_calendar": {
+      "title": "Planning Calendrier d'Exploitation",
+      "target_users": ["Chef de projet", "Gérant", "Technicien"],
+      "primary_decision": "Comment s'organise la charge de travail de l'entreprise sur la semaine ou le mois, et quels créneaux sont saturés ?",
+      "views_supported": ["Jour", "Semaine", "Mois"],
+      "default_view": "Semaine",
+      "interactions": [
+        "Glisser-déposer d'événement pour décaler des dates",
+        "Clic sur un bloc d'événement pour afficher le panneau latéral de synthèse rapide",
+        "Code couleur par statut d'événement ou par module métier",
+        "Ligne d'occupation des techniciens et camions"
+      ]
+    },
+    "contacts_crm": {
+      "title": "Contacts & Répertoire CRM",
+      "target_users": ["Commercial", "Chef de projet", "Comptable"],
+      "primary_decision": "Quel est l'historique de ce client, ses préférences techniques et ses devis en cours ?",
+      "segments": ["Clients Particuliers (Mariages, Anniversaires)", "Clients Entreprises & Agences", "Sous-traitants & Prestataires", "Salles partenaires"],
+      "detail_drawer": "Fiche contact avec historique des devis, solde en cours, événements passés et coordonnées du décideur."
+    },
+    "lieux_mapping": {
+      "title": "Lieux de Réception & Cartographie",
+      "target_users": ["Chef de projet", "Technicien / Chauffeur", "Commercial"],
+      "primary_decision": "Où se situent les chantiers du week-end et quelles sont les contraintes logistiques d'accès à la salle ?",
+      "map_engine": "Carte interactive Leaflet / OpenStreetMap",
+      "pin_data": [
+        "Nom de la salle / Domaine",
+        "Adresse & Coordonnées GPS",
+        "Accès camion (Hauteur limite, stationnement réservé)",
+        "Puissance électrique disponible (Ampérage, prises 32A/63A)",
+        "Liste des événements passés et à venir sur ce lieu"
+      ]
+    }
+  },
+  "visual_directions": {
+    "direction_1_chosen": {
+      "name": "Élégance Événementielle Chaude (Warm Champagne & Obsidian)",
+      "justification": "Choisie conformément à la consigne explicite 'Clair et élégant (fond clair, typographie raffinée, accents chauds)'. Elle combine un fond lin/albâtre chaleureux très lisible de jour avec des accents ambre doré/champagne et un texte charbon profond, conférant une aura haut de gamme digne des agences de prestige et traiteurs de luxe sans sacrifier la rigueur d'un ERP technique.",
+      "surface_temperature": "Chaude et lumineuse (fond lin clair, surfaces blanches pures en surélévation)",
+      "accent_family": "Ambre cuivre & champagne doré",
+      "typographic_feel": "Moderne, aérée et nette grâce à Figtree avec chiffres tabulaires"
+    },
+    "direction_2_rejected": {
+      "name": "Technique Minéral Froid (Slate & Industrial Cyan)",
+      "rejection_reason": "Trop axé régie de spectacle / entrepôt froid; manque du cachet événementiel premium et de la chaleur exigée par les agences de mariage et événements de prestige."
+    }
+  },
+  "visual_system": {
+    "color_palette_oklch": {
+      "background_app": "oklch(0.985 0.004 85)",
+      "background_surface": "oklch(1.000 0.000 0)",
+      "background_surface_raised": "oklch(0.970 0.006 85)",
+      "background_muted": "oklch(0.940 0.008 85)",
+      "border_subtle": "oklch(0.900 0.008 85)",
+      "border_strong": "oklch(0.750 0.015 80)",
+      "text_primary": "oklch(0.220 0.020 60)",
+      "text_secondary": "oklch(0.450 0.020 60)",
+      "text_tertiary": "oklch(0.620 0.015 60)",
+      "accent_primary": "oklch(0.550 0.125 45)",
+      "accent_hover": "oklch(0.480 0.125 45)",
+      "accent_subtle": "oklch(0.960 0.020 55)",
+      "accent_contrast_text": "oklch(1.000 0.000 0)",
+      "status_demande": "oklch(0.520 0.100 240)",
+      "status_demande_bg": "oklch(0.950 0.010 240)",
+      "status_devis": "oklch(0.550 0.120 290)",
+      "status_devis_bg": "oklch(0.950 0.010 290)",
+      "status_confirme": "oklch(0.520 0.095 150)",
+      "status_confirme_bg": "oklch(0.960 0.025 150)",
+      "status_preparation": "oklch(0.580 0.120 55)",
+      "status_preparation_bg": "oklch(0.950 0.010 55)",
+      "status_realise": "oklch(0.500 0.085 190)",
+      "status_realise_bg": "oklch(0.960 0.020 190)",
+      "status_facture": "oklch(0.550 0.095 100)",
+      "status_facture_bg": "oklch(0.960 0.025 100)",
+      "status_cloture": "oklch(0.460 0.020 60)",
+      "status_cloture_bg": "oklch(0.940 0.008 85)",
+      "danger": "oklch(0.550 0.150 28)",
+      "danger_bg": "oklch(0.955 0.018 25)",
+      "warning": "oklch(0.580 0.090 75)",
+      "warning_bg": "oklch(0.950 0.015 75)",
+      "success": "oklch(0.520 0.095 150)",
+      "success_bg": "oklch(0.960 0.025 150)"
+    },
+    "typography": {
+      "font_family_body": "Figtree, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "font_family_code": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+      "font_features": "cv02, cv03, cv04, cv11, tnum",
+      "reason": "Figtree apporte une géométrie chaleureuse, contemporaine et accessible parfaite pour l'événementiel et le retail haut de gamme, tout en conservant une grande lisibilité sur les tableaux de chiffrage grâce à ses chiffres tabulaires natifs.",
+      "weights": {
+        "regular": 400,
+        "medium": 500,
+        "semibold": 600
+      },
+      "scale": {
+        "text_2xs": { "size": "11px", "line_height": "14px", "tracking": "+0.02em", "usage": "Badges d'état compacts, surtitres, métadonnées secondaires" },
+        "text_xs": { "size": "12px", "line_height": "16px", "tracking": "0", "usage": "Libellés de formulaires, colonnes de tableaux, horodatages" },
+        "text_sm": { "size": "13px", "line_height": "18px", "tracking": "0", "usage": "Texte courant de table, description de tâche, navigation latérale" },
+        "text_base": { "size": "14px", "line_height": "20px", "tracking": "0", "usage": "Corps de texte principal, entrées de saisie, cartes" },
+        "text_md": { "size": "16px", "line_height": "24px", "tracking": "-0.01em", "usage": "Titres de cartes, sous-sections, montants financiers secondaires" },
+        "text_lg": { "size": "18px", "line_height": "26px", "tracking": "-0.01em", "usage": "Titres de modales, totaux financiers clés" },
+        "text_xl": { "size": "22px", "line_height": "28px", "tracking": "-0.015em", "usage": "Titres de pages d'exploitation, KPIs majeurs" },
+        "text_2xl": { "size": "28px", "line_height": "34px", "tracking": "-0.02em", "usage": "Chiffres vedettes du Dashboard, en-têtes d'événement" }
+      }
+    },
+    "spacing_grid": {
+      "base_unit": "4px",
+      "scale": {
+        "space_1": "4px",
+        "space_2": "8px",
+        "space_3": "12px",
+        "space_4": "16px",
+        "space_5": "20px",
+        "space_6": "24px",
+        "space_8": "32px",
+        "space_10": "40px"
+      },
+      "radius": {
+        "sm": "6px",
+        "md": "8px",
+        "lg": "12px",
+        "xl": "16px",
+        "full": "9999px"
+      },
+      "elevation_shadows": {
+        "card": "0 1px 3px 0 rgba(40, 25, 15, 0.05), 0 1px 2px -1px rgba(40, 25, 15, 0.05)",
+        "dropdown": "0 4px 6px -1px rgba(40, 25, 15, 0.07), 0 2px 4px -2px rgba(40, 25, 15, 0.05)",
+        "modal": "0 20px 25px -5px rgba(40, 25, 15, 0.1), 0 8px 10px -6px rgba(40, 25, 15, 0.08)"
+      }
+    }
+  },
+  "interactions_and_states": {
+    "loading_state": "Squelettes 'skeleton' à pulsation douce (durée 1.5s, courbe ease-in-out) reprenant exactement la géométrie des cartes Kanban et lignes de tableaux pour éviter tout saut visuel (CLS 0).",
+    "empty_state": "Illustration soignée avec icône métier discrète, titre explicite ('Aucun événement en attente de préparation'), texte d'accompagnement orientant l'action et bouton direct ('Créer un nouvel événement' ou 'Réinitialiser les filtres').",
+    "error_and_validation": "Messages d'erreur en ligne placés immédiatement sous le champ incriminé (texte rouge danger 12px avec icône). En cas d'échec de requête API, notification Toast Sonner non intrusive avec bouton 'Réessayer' et préservation intégrale des données saisies dans le formulaire.",
+    "conflict_indicator": "Surbrillance ambrée/rouge sur la ligne de matériel lorsque la demande dépasse la quantité disponible sur la période, avec pastille cliquable 'Conflit de stock' ouvrant immédiatement la suggestion de sous-location ou de substitution."
+  },
+  "accessibility_and_standards": {
+    "wcag_target": "WCAG 2.1 AA",
+    "keyboard_navigation": "Focus visible renforcé avec anneau d'accent (ring 2px offset 2px oklch(0.55 0.125 45)), raccourcis clavier globaux (Ctrl+K pour la recherche universelle, N pour nouvel événement, Échap pour fermer modales et tiroirs).",
+    "reduced_motion": "Respect de la requête CSS `prefers-reduced-motion: reduce` : remplacement de toutes les transitions coulissantes par des fondus instantanés de 0.05s."
+  },
+  "responsive_breakpoints": {
+    "desktop_wide": ">= 1440px : Affichage complet 7 colonnes Kanban, double volet de détail (panneau latéral fixe d'onglets)",
+    "desktop": "1024px - 1439px : Sidebar rétractable, Kanban avec défilement horizontal fluide et barres d'onglets scrollables",
+    "tablet": "768px - 1023px : Sidebar repliée par défaut en icônes, Drawer latéral pour la fiche événement, cartes Kanban condensées",
+    "mobile": "< 768px : Menu tiroir plein écran, bascule automatique du Kanban vers une vue liste groupée par statut avec accordéons, tableau de matériel adapté en cartes empilées avec actions tactiles (swipe ou boutons élargis à 44px min)."
+  }
+}
