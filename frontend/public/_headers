@@ -1,10 +1,19 @@
 /*
-  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://*.clerk.accounts.dev https://clerk.VOTRE-DOMAINE.com https://challenges.cloudflare.com; connect-src 'self' https://api.VOTRE-DOMAINE.com https://*.clerk.accounts.dev https://clerk.VOTRE-DOMAINE.com https://*.r2.cloudflarestorage.com; img-src 'self' data: blob: https://img.clerk.com https://*.r2.cloudflarestorage.com; style-src 'self' 'unsafe-inline'; frame-src https://challenges.cloudflare.com https://*.yousign.app; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' https://*.clerk.accounts.dev https://clerk.exclusivity-events.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://exclusivity-events-api.onrender.com https://*.clerk.accounts.dev https://clerk.exclusivity-events.com; frame-src 'self' blob: https://challenges.cloudflare.com; worker-src 'self' blob:
 
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
+/devis/*
+  X-Robots-Tag: noindex, nofollow
+/suivi/*
+  X-Robots-Tag: noindex, nofollow
+/reponse/*
+  X-Robots-Tag: noindex, nofollow
+/musique/*
+  X-Robots-Tag: noindex, nofollow
+/rejoindre
+  X-Robots-Tag: noindex, nofollow

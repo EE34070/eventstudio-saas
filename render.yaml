@@ -1,60 +1,90 @@
-# Blueprint Render — région Francfort (UE). Le frontend est sur Cloudflare Pages, pas ici.
 services:
   - type: web
     name: eventstudio-api
-    runtime: docker
+    runtime: python
     region: frankfurt
-    plan: standard            # 2 Go RAM ; passer en pro au-delà de ~50 organisations actives
-    rootDir: backend
+    plan: starter
+    buildCommand: cd backend && grep -v '^litellm' requirements.txt > requirements.render.txt && pip install -r requirements.render.txt --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/
+    startCommand: cd backend && uvicorn server:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
-    preDeployCommand: python -m scripts.migrate   # met à jour toutes les bases sociétés avant bascule
-    autoDeploy: true
-    numInstances: 2           # 2 instances = pas de coupure pendant les déploiements
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
       - key: ENV
-        value: production
-      - fromGroup: eventstudio-prod-secrets
-      - key: REDIS_URL
-        fromService: { type: keyvalue, name: eventstudio-redis, property: connectionString }
-
-  - type: worker
-    name: eventstudio-worker
-    runtime: docker
-    region: frankfurt
-    plan: starter
-    rootDir: backend
-    dockerCommand: arq app.workers.worker.WorkerSettings
-    envVars:
-      - key: ENV
-        value: production
-      - fromGroup: eventstudio-prod-secrets
-      - key: REDIS_URL
-        fromService: { type: keyvalue, name: eventstudio-redis, property: connectionString }
-
-  - type: keyvalue
-    name: eventstudio-redis
-    region: frankfurt
-    plan: starter
-    ipAllowList: []           # accès réseau privé Render uniquement
-    maxmemoryPolicy: noeviction
-
-envVarGroups:
-  - name: eventstudio-prod-secrets
-    envVars:
-      - { key: MONGO_URI, sync: false }
-      - { key: CONTROL_DB, value: platform }
-      - { key: TENANT_CLUSTERS, sync: false }
-      - { key: MAX_TENANTS_PER_CLUSTER, value: "35" }
-      - { key: CLERK_ISSUER, sync: false }
-      - { key: CLERK_JWKS_URL, sync: false }
-      - { key: CLERK_AUTHORIZED_PARTIES, sync: false }
-      - { key: CORS_ORIGINS, sync: false }
-      - { key: ENCRYPTION_KEY, sync: false }
-      - { key: R2_ENDPOINT, sync: false }
-      - { key: R2_ACCESS_KEY_ID, sync: false }
-      - { key: R2_SECRET_ACCESS_KEY, sync: false }
-      - { key: R2_BUCKET, value: eventstudio-files-prod }
-      - { key: STRIPE_SECRET_KEY, sync: false }
-      - { key: STRIPE_WEBHOOK_SECRET, sync: false }
-      - { key: ANTHROPIC_API_KEY, sync: false }
-      - { key: SENTRY_DSN, sync: false }
+        value: staging
+      - key: CLERK_AUTHORIZED_PARTIES
+        sync: false
+      - key: CLERK_ISSUER
+        sync: false
+      - key: CLERK_JWKS_URL
+        sync: false
+      - key: FILE_SIGNING_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: RUN_MIGRATIONS
+        value: "false"
+      - key: STAFF_ENCRYPTION_KEY
+        sync: false
+      - key: BACKUP_ENCRYPTION_KEY
+        sync: false
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: platform
+      - key: CONTROL_DB          # base plateforme (sociétés, comptes, index des liens publics)
+        value: platform
+      - key: TENANT_CLUSTERS     # clusters dédiés (offre Entreprise), JSON {"dedie-xxx": "mongodb+srv://..."}
+        value: "{}"
+      - key: APP_NAME
+        value: EventStudio
+      - key: CORS_ORIGINS
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_USE_PROXY
+        value: "false"
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: WEBHOOK_CRON_SECRET
+        sync: false
+      - key: STORAGE_PROVIDER
+        value: s3
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_BUCKET
+        value: exclusivity-app-files
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: resend
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_FROM_NAME
+        value: Exclusivity Events
+      - key: YOUSIGN_BASE_URL
+        value: https://api-sandbox.yousign.app/v3
+      - key: YOUSIGN_API_KEY
+        sync: false
+      - key: YOUSIGN_WEBHOOK_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_PUBSUB_TOPIC
+        sync: false
+      - key: PUBSUB_PUSH_SA_EMAIL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CLAUDE_MODEL
+        value: claude-haiku-5-5
+      - key: CLAUDE_REPLY_MODEL
+        value: claude-sonnet-5-5

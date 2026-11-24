@@ -1,0 +1,9 @@
+{
+  "name": "Exclusivity Events",
+  "short_name": "Exclusivity",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0347FB",
+  "share_target": { "action": "/demande/nouvelle", "method": "GET", "params": { "title": "title", "text": "text", "url": "url" } }
+}

@@ -1,65 +1,100 @@
-"""Fixtures : clusters Mongo en mémoire, sociétés créées par le vrai provisioning.
+import os
 
-L'authentification Clerk est remplacée par l'en-tête X-Test-User (tests uniquement).
-"""
-from datetime import UTC, datetime
+from dotenv import dotenv_values
+
+if (os.environ.get("ENV") or dotenv_values("/app/backend/.env").get("ENV") or "").strip().lower() != "development":
+    raise SystemExit("Tests refusés : ENV doit valoir development (jamais sur la base de production).")
+import subprocess
 
 import pytest
-import pytest_asyncio
-from fastapi import HTTPException, Request
-from httpx import ASGITransport, AsyncClient
-from mongomock_motor import AsyncMongoMockClient
+import requests
 
-from app.core.auth import Principal, current_principal
-from app.core.db import ClusterRouter
-from app.core.provisioning import create_org
-from app.main import create_app
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
+if not BASE_URL:
+    for line in open("/app/frontend/.env"):
+        if line.startswith("REACT_APP_BACKEND_URL="):
+            BASE_URL = line.split("=", 1)[1].strip().rstrip("/")
+API = BASE_URL + "/api"
 
-NOW = datetime(2026, 1, 1, tzinfo=UTC)
-
-
-async def fake_principal(request: Request) -> Principal:
-    uid = request.headers.get("X-Test-User")
-    if not uid:
-        raise HTTPException(401, "Authentification requise")
-    return Principal(user_id=uid)
+_cache = {}
 
 
-@pytest_asyncio.fixture
-async def router():
-    # Un cluster partagé + un cluster dédié (offre Entreprise)
-    return ClusterRouter({"default": AsyncMongoMockClient(), "dedie-acme": AsyncMongoMockClient()})
+def token_for(email, role, mode="demo"):
+    if mode == "demo" and os.environ.get("ALLOW_REAL_ORG_TESTS") != "1":
+        pytest.skip("Suite ciblant la société réelle : désactivée (tests en société QA uniquement)")
+    key = (email, role, mode)
+    if key not in _cache:
+        out = subprocess.run(["python3", "/app/scripts/clerk_token.py", email, role, mode],
+                             capture_output=True, text=True, timeout=60)
+        if out.returncode != 0:
+            pytest.skip(f"token failure: {out.stderr[-300:]}")
+        _cache[key] = out.stdout.strip().splitlines()[-1]
+    return _cache[key]
 
 
-@pytest_asyncio.fixture
-async def seeded(router):
-    await create_org(router, org_id="org_a", name="Org A", slug="a", owner_user_id="alice", plan="pro", status="active")
-    await create_org(router, org_id="org_b", name="Org B", slug="b", owner_user_id="bob", plan="essentiel", status="active")
-    await create_org(router, org_id="org_c", name="Org C impayée", slug="c", owner_user_id="carl", plan="pro", status="past_due")
-    await create_org(router, org_id="org_d", name="Acme (dédié)", slug="d", owner_user_id="dora",
-                     plan="enterprise", status="active", dedicated_cluster="dedie-acme")
-    await router.control.memberships.insert_many([
-        {"user_id": "tech", "org_id": "org_a", "role": "technician", "status": "active", "created_at": NOW},
-        # Prestataire multi-sociétés : un compte, deux memberships
-        {"user_id": "dj", "org_id": "org_a", "role": "partner", "status": "active", "created_at": NOW},
-        {"user_id": "dj", "org_id": "org_b", "role": "partner", "status": "active", "created_at": NOW},
-    ])
-    return router
+def client(email, role, mode="demo"):
+    s = requests.Session()
+    s.headers.update({"Authorization": f"Bearer {token_for(email, role, mode)}", "Content-Type": "application/json"})
+    return s
 
 
-@pytest_asyncio.fixture
-async def client(seeded):
-    app = create_app(router=seeded)
-    app.dependency_overrides[current_principal] = fake_principal
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
-        yield c
+@pytest.fixture(scope="session")
+def admin():
+    return client("test_admin+clerk_test@example.com", "admin")
 
 
-@pytest.fixture
-def as_user():
-    def _h(uid: str, org: str | None = None) -> dict:
-        h = {"X-Test-User": uid}
-        if org:
-            h["X-Org-Id"] = org
-        return h
-    return _h
+@pytest.fixture(scope="session")
+def tech():
+    return client("test_tech+clerk_test@example.com", "technicien")
+
+
+@pytest.fixture(scope="session")
+def compta():
+    return client("test_compta+clerk_test@example.com", "comptable")
+
+
+@pytest.fixture(scope="session")
+def commercial():
+    return client("test_commercial+clerk_test@example.com", "commercial")
+
+
+@pytest.fixture(scope="session")
+def events_by_code(admin):
+    r = admin.get(f"{API}/events")
+    assert r.status_code == 200
+    return {e["code"]: e for e in r.json()}
+
+
+# Suites whose classes share state in order: keep the whole file on one xdist worker.
+SEQUENTIAL_FILES = ("test_iter25_access_profiles_extra.py", "test_iter22_access_profiles.py", "test_iter21_member_invite.py", "test_iter20_quote_duplicate.py", "test_iter19_event_quotes.py", "test_iter18_quote_docs.py", "test_iter11_staff.py", "test_iter14_stock.py", "test_iter15_logistics.py", "test_iter16_missions_tracking.py")
+
+
+def pytest_xdist_make_scheduler(config, log):
+    from xdist.scheduler.loadscope import LoadScopeScheduling
+
+    class Sched(LoadScopeScheduling):
+        def _split_scope(self, nodeid):
+            path = nodeid.split("::", 1)[0]
+            return path if path.endswith(SEQUENTIAL_FILES) else super()._split_scope(nodeid)
+
+    return Sched(config, log)
+
+
+# CI / poste sans clés Clerk de test : les suites qui exigent Clerk, la société QA, Gmail, Spotify ou d'autres secrets sont ignorées (skip), pas en échec.
+from pathlib import Path
+
+from dotenv import dotenv_values
+
+_REPO = Path(__file__).resolve().parents[2]
+HAS_CLERK = bool(os.environ.get("CLERK_SECRET_KEY") or dotenv_values(_REPO / "backend" / ".env").get("CLERK_SECRET_KEY"))
+_EXTERNAL = ("qa_token", "clerk_token", "clerk_ticket", "/app/backend/.env", "test_iter54_dj_tab_roadmap", "import API, client")
+
+
+class _SkippedModule(pytest.Module):
+    def collect(self):
+        pytest.skip("Exige Clerk de test, la société QA ou des secrets absents de cet environnement")
+
+
+def pytest_pycollect_makemodule(module_path, parent):
+    if not HAS_CLERK and module_path.name.startswith("test_") and any(k in module_path.read_text() for k in _EXTERNAL):
+        return _SkippedModule.from_parent(parent, path=module_path)
