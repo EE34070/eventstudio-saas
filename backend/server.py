@@ -115,6 +115,12 @@ INDEXES: dict[str, list[IndexModel]] = {
     "guest_suggestions": [IndexModel([("org_id", ASCENDING), ("plan_id", ASCENDING), ("status", ASCENDING)], name="plan_status")],
     "gdpr_requests": [_org_id()],
     "supplier_quotes": [_org_id(), IndexModel([("org_id", ASCENDING), ("quote_id", ASCENDING)], name="org_quote")],
+    "work_orders": [_org_id(), IndexModel([("org_id", ASCENDING), ("status", ASCENDING), ("deadline", ASCENDING)], name="org_status_deadline"),
+                    IndexModel([("org_id", ASCENDING), ("scheduled_start", ASCENDING)], name="org_start"),
+                    IndexModel([("org_id", ASCENDING), ("parent_id", ASCENDING)], name="org_parent"),
+                    IndexModel([("org_id", ASCENDING), ("recurrence_id", ASCENDING), ("occurrence_date", ASCENDING)], name="org_occurrence")],
+    "work_templates": [_org_id()],
+    "work_recurrences": [_org_id()],
     "loadings": [_org_id(), IndexModel([("org_id", ASCENDING), ("day", ASCENDING), ("event_id", ASCENDING)], name="day_event", unique=True)],
 }
 
@@ -249,6 +255,8 @@ app.include_router(routes_statements.router)
 app.include_router(routes_titles.router)
 app.include_router(routes_pack_i18n.router)
 app.include_router(routes_dj_conflicts.router)
+import routes_works  # noqa: E402
+app.include_router(routes_works.router)
 import routes_schedule  # noqa: E402
 app.include_router(routes_schedule.router)
 import routes_reuse  # noqa: E402

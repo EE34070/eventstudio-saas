@@ -27,7 +27,7 @@ client = tenants.CLUSTERS.clients["default"]
 raw_db = tenants.RoutedDatabase()
 # Collections soumises à la Corbeille : toute lecture exclut par défaut les éléments supprimés (deleted_at renseigné).
 TRASHED = {"team", "social_managers", "provider_profiles", "contacts", "venues", "equipment", "packs", "kits", "vehicles", "warehouses", "events", "quotes", "invoices", "tasks", "expense_reports",
-           "subscriptions", "purchase_invoices", "access_profiles", "media_assets", "comm_posts", "logistics_missions", "dj_bookings"}
+           "subscriptions", "purchase_invoices", "access_profiles", "media_assets", "comm_posts", "logistics_missions", "dj_bookings", "work_orders", "work_templates"}
 
 
 def _live(f):

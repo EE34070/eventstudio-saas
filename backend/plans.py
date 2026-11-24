@@ -15,7 +15,7 @@ from fastapi import HTTPException
 
 VENTES = {"events", "contacts", "crm", "quotes", "invoices", "accounting", "catalog", "venues", "providers",
           "messages", "inbound", "tasks", "team", "portals", "users", "settings"}
-OPERATIONS = {"stock", "logistics", "vehicles", "staff", "music", "purchases", "expenses"}
+OPERATIONS = {"stock", "logistics", "works", "vehicles", "staff", "music", "purchases", "expenses"}
 GESTION = {"finance", "social", "communication"}
 
 PLANS: dict[str, dict] = {

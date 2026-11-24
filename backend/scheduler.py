@@ -42,6 +42,8 @@ def start() -> AsyncIOScheduler:
     import routes_dj
     s.add_job(locked("dj-daily", 3600, routes_dj.tick), "cron", hour=9, minute=0)
     s.add_job(locked("access-lifecycle", 1800, routes_access.tick), "interval", minutes=60, max_instances=1, coalesce=True)
+    import routes_works
+    s.add_job(locked("works-recurrence", 3600, routes_works.tick), "cron", hour=4, minute=10)
     import routes_communication
     s.add_job(locked("comms-tick", 840, routes_communication.tick), "interval", minutes=15, max_instances=1, coalesce=True)
     s.start()

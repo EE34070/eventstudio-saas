@@ -20,6 +20,7 @@ const Contacts = lazy(() => import("@/pages/Contacts"));
 const Venues = lazy(() => import("@/pages/Venues"));
 const Team = lazy(() => import("@/pages/Equipe"));
 const Todo = lazy(() => import("@/pages/Todo"));
+const TravauxInternes = lazy(() => import("@/pages/TravauxInternes"));
 const Entrepots = lazy(() => import("@/pages/Entrepots"));
 const Logistique = lazy(() => import("@/pages/Logistique"));
 const adm = (n) => lazy(() => import("@/pages/Admin").then((m) => ({ default: m[n] })));
@@ -113,6 +114,7 @@ function Gate() {
         <Route path="lieux" element={<Venues />} />
         <Route path="equipe" element={<Team />} />
         <Route path="todo" element={<Todo />} />
+        <Route path="travaux" element={<TravauxInternes />} />
         <Route path="entrepots" element={<Entrepots />} />
         <Route path="logistique" element={<Logistique />} />
         <Route path="vehicules" element={<Vehicles />} />
