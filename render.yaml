@@ -1,0 +1,60 @@
+# Blueprint Render — région Francfort (UE). Le frontend est sur Cloudflare Pages, pas ici.
+services:
+  - type: web
+    name: eventstudio-api
+    runtime: docker
+    region: frankfurt
+    plan: standard            # 2 Go RAM ; passer en pro au-delà de ~50 organisations actives
+    rootDir: backend
+    healthCheckPath: /api/health
+    preDeployCommand: python -m scripts.migrate   # met à jour toutes les bases sociétés avant bascule
+    autoDeploy: true
+    numInstances: 2           # 2 instances = pas de coupure pendant les déploiements
+    envVars:
+      - key: ENV
+        value: production
+      - fromGroup: eventstudio-prod-secrets
+      - key: REDIS_URL
+        fromService: { type: keyvalue, name: eventstudio-redis, property: connectionString }
+
+  - type: worker
+    name: eventstudio-worker
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    rootDir: backend
+    dockerCommand: arq app.workers.worker.WorkerSettings
+    envVars:
+      - key: ENV
+        value: production
+      - fromGroup: eventstudio-prod-secrets
+      - key: REDIS_URL
+        fromService: { type: keyvalue, name: eventstudio-redis, property: connectionString }
+
+  - type: keyvalue
+    name: eventstudio-redis
+    region: frankfurt
+    plan: starter
+    ipAllowList: []           # accès réseau privé Render uniquement
+    maxmemoryPolicy: noeviction
+
+envVarGroups:
+  - name: eventstudio-prod-secrets
+    envVars:
+      - { key: MONGO_URI, sync: false }
+      - { key: CONTROL_DB, value: platform }
+      - { key: TENANT_CLUSTERS, sync: false }
+      - { key: MAX_TENANTS_PER_CLUSTER, value: "35" }
+      - { key: CLERK_ISSUER, sync: false }
+      - { key: CLERK_JWKS_URL, sync: false }
+      - { key: CLERK_AUTHORIZED_PARTIES, sync: false }
+      - { key: CORS_ORIGINS, sync: false }
+      - { key: ENCRYPTION_KEY, sync: false }
+      - { key: R2_ENDPOINT, sync: false }
+      - { key: R2_ACCESS_KEY_ID, sync: false }
+      - { key: R2_SECRET_ACCESS_KEY, sync: false }
+      - { key: R2_BUCKET, value: eventstudio-files-prod }
+      - { key: STRIPE_SECRET_KEY, sync: false }
+      - { key: STRIPE_WEBHOOK_SECRET, sync: false }
+      - { key: ANTHROPIC_API_KEY, sync: false }
+      - { key: SENTRY_DSN, sync: false }

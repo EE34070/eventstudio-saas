@@ -1,0 +1,13 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+motor>=3.6
+pydantic>=2.9
+pydantic-settings>=2.5
+email-validator>=2.2
+PyJWT[crypto]>=2.9
+cryptography>=43
+boto3>=1.35
+stripe>=11
+arq>=0.26
+anthropic>=0.40
+sentry-sdk[fastapi]>=2.14

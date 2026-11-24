@@ -1,0 +1,15 @@
+# Environnement local : docker compose up -d, puis backend (uvicorn) + frontend (npm run dev)
+services:
+  mongo:
+    image: mongo:7
+    command: ["--replSet", "rs0", "--bind_ip_all"]   # replica set = transactions multi-documents
+    ports: ["27017:27017"]
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "try{rs.status().ok}catch(e){rs.initiate().ok}"]
+      interval: 5s
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+volumes:
+  mongo-data:
