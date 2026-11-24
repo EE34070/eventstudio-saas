@@ -5,3 +5,4 @@ __pycache__/
 node_modules/
 dist/
 memory/test_credentials.md
+frontend/dist-demo/

@@ -18,3 +18,27 @@ button { background:var(--accent); color:#fff; border:none; cursor:pointer; }
 table { width:100%; border-collapse:collapse; background:var(--panel); }
 th, td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); }
 .list { list-style:none; padding:0; } .list li { padding:8px 0; border-bottom:1px solid var(--line); }
+
+/* --- Mise en page « focus » (branding.layout = "focus") : couleurs et polices de l'organisation --- */
+.focus { --b-primary:#1d1d1b; --b-bg:#f7f7f5; --b-surface:#fff; --b-ink:#1d1d1b; --b-muted:#6b6b66; --b-line:#e6e5e0;
+  --b-soft:#c9c9c2; --b-alert:#9a3412; --b-display:Georgia,serif; --b-body:Inter,system-ui,sans-serif;
+  min-height:100vh; background:var(--b-bg); color:var(--b-ink); font:300 15px/1.55 var(--b-body); }
+.focus-head { background:var(--b-bg); border-bottom:1px solid var(--b-line); padding:16px 20px 0; position:sticky; top:0; z-index:5; }
+.focus-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; max-width:1240px; margin:0 auto; }
+.focus-mark { font-family:var(--b-display); font-weight:500; letter-spacing:4px; text-transform:uppercase; font-size:22px; color:var(--b-primary); }
+.focus-mark img { max-height:34px; display:block; }
+.focus-sub { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--b-muted); }
+.focus-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; position:relative; }
+.focus-tabs { display:flex; gap:2px; margin:8px auto 0; overflow-x:auto; max-width:1240px; }
+.focus-tabs a, .focus-tabs button { background:none; border:0; border-bottom:2px solid transparent; border-radius:0; padding:10px 14px;
+  font:400 12px var(--b-body); letter-spacing:1.5px; text-transform:uppercase; color:var(--b-muted); text-decoration:none; white-space:nowrap; cursor:pointer; }
+.focus-tabs a.active { color:var(--b-primary); border-bottom-color:var(--b-primary); }
+.focus-tabs button:disabled { opacity:.45; cursor:default; }
+.focus-main { max-width:1040px; margin:0 auto; padding:26px 20px 90px; }
+.focus-warning { text-align:center; color:var(--b-alert); font-size:13px; margin:8px; }
+
+/* Bandeau du mode démo */
+.demo-bar { background:#1F3D2B; color:#F2F1EB; padding:8px 20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; font:300 12px Montserrat, system-ui, sans-serif; }
+.demo-bar b { font-weight:500; letter-spacing:1.5px; text-transform:uppercase; }
+.demo-bar button { background:transparent; color:#F2F1EB; border:1px solid #a9c0ac; border-radius:0; padding:5px 12px; font:400 11px Montserrat, system-ui, sans-serif; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; }
+.demo-bar button[aria-pressed=true] { background:#F2F1EB; color:#1F3D2B; }

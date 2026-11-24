@@ -11,5 +11,10 @@ export type FrontModule = {
   category: "core" | "ventes" | "operations" | "metiers" | "gestion";
   order?: number;
   routes: { path: string; component: LazyExoticComponent<ComponentType> }[];
-  nav: { label: string; to: string }[];
+  /** soon : entrée visible mais désactivée (fonction à venir) */
+  nav: { label: string; to: string; soon?: boolean }[];
+  /** Outils affichés dans l'en-tête (ex. notifications du module) */
+  headerTools?: LazyExoticComponent<ComponentType>;
+  /** Espace externe (portail) servi par ce module pour ces rôles : client, partner, organizer */
+  portal?: { roles: string[]; component: LazyExoticComponent<ComponentType> };
 };

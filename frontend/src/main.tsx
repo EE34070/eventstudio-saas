@@ -1,10 +1,14 @@
-import { StrictMode } from "react";
+import { StrictMode, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import App from "@/app/App";
 import "./styles.css";
+
+// Mode démo (npm run build:demo) : vrais écrans, faux serveur en mémoire, sans Clerk ni API.
+const Root = import.meta.env.VITE_DEMO === "1" ? lazy(() => import("@/demo/DemoApp")) : lazy(() => import("@/app/App"));
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <Suspense fallback={null}>
+      <Root />
+    </Suspense>
   </StrictMode>,
 );

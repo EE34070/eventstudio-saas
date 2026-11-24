@@ -31,3 +31,13 @@ npm install && npm run dev                  # http://localhost:5173
 - API + worker + Redis : `render.yaml` (Blueprint Render, région Francfort)
 - Frontend : Cloudflare Pages, dossier `frontend`, commande `npm run build`, sortie `dist`
 - CI : `.github/workflows/ci.yml` (tests, lint, audit des dépendances)
+
+## Module Wedding planner
+
+Espace de l'organisatrice (`/mariages`) et espace privé des mariés (portail, rôle `client`, FR/EN).
+Détail : `docs/WEDDING_PLANNER.md`.
+
+```bash
+cd frontend && npm run build:demo   # démo cliquable sans backend (données fictives) dans dist-demo/
+cd backend && python -m scripts.seed_wedding_planner --owner user_XXXX   # organisation de démonstration
+```

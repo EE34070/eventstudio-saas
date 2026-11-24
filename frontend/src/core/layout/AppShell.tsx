@@ -2,12 +2,14 @@ import { NavLink, Outlet } from "react-router-dom";
 import { UserButton } from "@clerk/react";
 import { useSession } from "@/core/session/SessionProvider";
 import { CATEGORY_LABELS, frontModules } from "@/core/modules/registry";
+import { FocusShell } from "./FocusShell";
 
 export function AppShell() {
   const { session, hasModule, switchOrg } = useSession();
   const visible = frontModules.filter((m) => hasModule(m.key));
   const categories = Object.keys(CATEGORY_LABELS) as (keyof typeof CATEGORY_LABELS)[];
   const appName = session.branding.app_name ?? "EventStudio";
+  if (session.branding.layout === "focus") return <FocusShell userSlot={<UserButton />} />;
 
   return (
     <div className="shell">
@@ -29,7 +31,7 @@ export function AppShell() {
             return (
               <section key={cat}>
                 <h4>{CATEGORY_LABELS[cat]}</h4>
-                {mods.flatMap((m) => m.nav).map((n) => (
+                {mods.flatMap((m) => m.nav).filter((n) => !n.soon).map((n) => (
                   <NavLink key={n.to} to={n.to}>{n.label}</NavLink>
                 ))}
               </section>

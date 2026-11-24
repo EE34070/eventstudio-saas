@@ -13,7 +13,26 @@ export type Session = {
   subscription_status: string;
   limits: Record<string, number>;
   modules: ModuleInfo[];
-  branding: { app_name?: string; logo_url?: string; primary_color?: string };
+  branding: Branding;
+};
+
+/** Image de marque de l'organisation (marque blanche) : rien n'est codé en dur dans le produit. */
+export type Branding = {
+  app_name?: string;
+  logo_url?: string;
+  primary_color?: string;
+  background?: string;
+  surface?: string;
+  ink?: string;
+  muted?: string;
+  line?: string;
+  soft?: string;
+  alert?: string;
+  font_display?: string;
+  font_body?: string;
+  /** "focus" : en-tête horizontal sans barre latérale (organisation mono-métier) */
+  layout?: "sidebar" | "focus";
+  home_path?: string;
 };
 
 type Ctx = {
@@ -54,6 +73,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       qc.clear(); // aucune donnée d'une organisation ne doit survivre au changement
       qc.invalidateQueries();
     },
+  };
+  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
+}
+
+/** Session fournie telle quelle (mode démo, tests) sans appel à /api/me. */
+export function StaticSessionProvider({ session, children }: { session: Session; children: ReactNode }) {
+  const byKey = new Map(session.modules.map((m) => [m.key, m]));
+  const value: Ctx = {
+    session,
+    hasModule: (k) => byKey.has(k),
+    canWrite: (k) => !!byKey.get(k)?.can_write,
+    switchOrg: () => undefined,
   };
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
