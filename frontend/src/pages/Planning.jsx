@@ -10,6 +10,7 @@ import { api } from "@/lib/api";
 import { dayKey, daysBetween, fmtDate } from "@/lib/constants";
 import { useMe } from "@/context/MeContext";
 import { Filters, Resources } from "@/components/planning/Resources";
+import WorksTeam from "@/components/planning/WorksTeam";
 
 const WD = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
@@ -92,8 +93,9 @@ function DayView({ k, events }) {
 }
 
 export default function Planning() {
-  const { can } = useMe();
-  const [view, setView] = useState(window.innerWidth < 768 ? "day" : "month");
+  const { can, me } = useMe();
+  const works = (!me?.plan || me.plan.sections.includes("works")) && (!me?.grid || !!me.grid.works?.view);
+  const [view, setView] = useState(new URLSearchParams(window.location.search).get("vue") === "equipe" ? "team" : window.innerWidth < 768 ? "day" : "month");
   const [cursor, setCursor] = useState(new Date());
   const [events, setEvents] = useState(null);
   const [team, setTeam] = useState([]);
@@ -103,7 +105,7 @@ export default function Planning() {
 
   const days = useMemo(() => {
     if (view === "month") { const s = monday(new Date(cursor.getFullYear(), cursor.getMonth(), 1)); return Array.from({ length: 42 }, (_, i) => addDays(s, i)); }
-    if (view === "week" || view === "resources") { const s = monday(cursor); return Array.from({ length: 7 }, (_, i) => addDays(s, i)); }
+    if (view === "week" || view === "resources" || view === "team") { const s = monday(cursor); return Array.from({ length: 7 }, (_, i) => addDays(s, i)); }
     return [new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate())];
   }, [view, cursor]);
 
@@ -150,13 +152,13 @@ export default function Planning() {
         </div>
         <h2 className="font-display text-xl first-letter:uppercase" data-testid="planning-title">{title}</h2>
         <div className="ml-auto flex rounded-xl border border-border bg-card p-1">
-          {[["day", "Jour"], ["week", "Semaine"], ["month", "Mois"], ["resources", "Ressources"]].map(([k, l]) => (
+          {[["day", "Jour"], ["week", "Semaine"], ["month", "Mois"], ["resources", "Ressources"], ...(works ? [["team", "Équipe"]] : [])].map(([k, l]) => (
             <button key={k} onClick={() => setView(k)} data-testid={`planning-view-${k}`} className={`rounded-lg px-3 py-1.5 text-xs font-medium ${view === k ? "bg-foreground text-background" : "text-muted-foreground"}`}>{l}</button>
           ))}
         </div>
       </div>
-      <Filters value={flt} onChange={setFlt} vehicles={vehicles} team={team} venues={venues} />
-      {!events ? <Loading /> : view === "day" ? <DayView k={dayKey(days[0])} events={shown} /> : view === "resources" ? <Resources days={days} events={shown} vehicles={vehicles} team={team} coversDay={coversDay} canDrag={canDrag} onDrop={dropRes} /> : (
+      {view !== "team" && <Filters value={flt} onChange={setFlt} vehicles={vehicles} team={team} venues={venues} />}
+      {view === "team" ? <WorksTeam days={days} canEdit={can("catalog:write")} /> : !events ? <Loading /> : view === "day" ? <DayView k={dayKey(days[0])} events={shown} /> : view === "resources" ? <Resources days={days} events={shown} vehicles={vehicles} team={team} coversDay={coversDay} canDrag={canDrag} onDrop={dropRes} /> : (
         <>
           <div className="card-soft overflow-x-auto">
             <div className="min-w-[760px]">
