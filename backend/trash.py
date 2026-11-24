@@ -17,7 +17,7 @@ KINDS = {"member": ("team", "users", "users:delete", "Membre"), "manager": ("soc
          "contact": ("contacts", "contacts", "contacts:write", "Contact"), "venue": ("venues", "venues", "venues:write", "Lieu"), "product": ("equipment", "catalog", "catalog:write", "Produit / matériel"),
          "pack": ("packs", "catalog", "catalog:write", "Pack"), "kit": ("kits", "catalog", "catalog:write", "Nomenclature"), "vehicle": ("vehicles", "vehicles", "catalog:write", "Véhicule"),
          "warehouse": ("warehouses", "stock", "catalog:write", "Entrepôt"), "event": ("events", "events", "events:delete", "Événement"), "quote": ("quotes", "quotes", "finance:write", "Devis"),
-         "invoice": ("invoices", "invoices", "finance:write", "Facture"), "task": ("tasks", "tasks", "events:read", "Tâche"), "expense": ("expense_reports", "expenses", "events:read", "Note de frais"),
+         "invoice": ("invoices", "invoices", "finance:write", "Facture"), "task": ("tasks", "tasks", "events:read", "Tâche"), "work_order": ("work_orders", "works", "catalog:write", "Travail interne"), "work_template": ("work_templates", "works", "catalog:write", "Modèle de travail"), "expense": ("expense_reports", "expenses", "events:read", "Note de frais"),
          "subscription": ("subscriptions", "purchases", "finance:write", "Abonnement"), "purchase": ("purchase_invoices", "purchases", "finance:write", "Achat"),
          "profile": ("access_profiles", "users", "users:manage", "Profil d'accès"), "media": ("media_assets", "communication", "comms:manage", "Média"), "post": ("comm_posts", "communication", "comms:manage", "Publication")}
 MODULES = {k[1] for k in KINDS.values()}

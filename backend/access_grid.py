@@ -7,17 +7,17 @@ MODULES = [("events", "Événements", "Events"), ("contacts", "Contacts", "Conta
            ("invoices", "Facturation clients", "Invoicing"), ("accounting", "Relances & comptabilité", "Reminders & accounting"), ("finance", "Finance & pilotage", "Finance"), ("social", "Pôle Social (RH, paie, congés)", "HR & payroll"),
            ("purchases", "Achats (factures d'achat, abonnements)", "Purchases"), ("expenses", "Notes de frais", "Expenses"),
            ("catalog", "Matériel & catalogue", "Equipment"), ("stock", "Stock & entrepôts", "Stock & warehouses"),
-           ("logistics", "Logistique, chargement, livraison & planning", "Logistics & planning"), ("vehicles", "Véhicules", "Vehicles"), ("venues", "Lieux", "Venues"),
+           ("logistics", "Logistique, chargement, livraison & planning", "Logistics & planning"), ("works", "Travaux internes", "Internal works"), ("vehicles", "Véhicules", "Vehicles"), ("venues", "Lieux", "Venues"),
            ("providers", "Prestataires", "Providers"), ("staff", "Staff & missions", "Staff & jobs"), ("music", "Ma musique (DJ)", "Music"),
            ("messages", "Messagerie", "Messaging"), ("communication", "Communication (médiathèque, collectes, publications)", "Communication"), ("inbound", "Saisie rapide IA", "Quick AI entry"), ("tasks", "To-do", "To-do"), ("team", "Équipe", "Team"),
            ("portals", "Espaces clients & portails", "Client portals"), ("users", "Membres & accès", "Members & access"), ("settings", "Paramètres", "Settings")]
 KEYS = [m[0] for m in MODULES]
-SCOPES = {"events": ["all", "assigned"], "tasks": ["all", "own"], "expenses": ["all", "own"]}
+SCOPES = {"events": ["all", "assigned"], "tasks": ["all", "own"], "expenses": ["all", "own"], "works": ["all", "own"]}
 FIRST = {"finance": "finance", "social": "social", "communication": "communication", "events": "events", "contacts": "contacts", "organizers": "contacts", "contact-statuses": "contacts", "contact-people": "contacts", "contact-roles": "contacts", "wedding-planners": "contacts", "opportunities": "crm", "crm": "crm",
          "quotes": "quotes", "quote-templates": "quotes", "quote-section-templates": "quotes", "quote-views": "quotes", "dj": "providers", "supplier-quotes": "quotes", "margin-rules": "settings", "invoices": "invoices", "reminders": "accounting",
          "purchase-invoices": "purchases", "purchase-needs": "purchases", "shortages": "logistics", "partner-requests": "logistics", "subscriptions": "purchases", "loans": "purchases", "contracts": "purchases", "contract-documents": "purchases", "bank-accounts": "purchases", "subscription-invoices": "purchases", "debits": "purchases", "expenses": "expenses",
          "equipment": "catalog", "catalog": "catalog", "supplier-products": "catalog", "catalogue-import": "catalog", "uoms": "catalog", "kits": "catalog", "attribute-templates": "catalog", "packs": "catalog", "product-documents": "catalog", "requirement-templates": "catalog", "stock": "stock", "warehouses": "stock",
-         "logistics": "logistics", "loading": "logistics", "deliveries": "logistics", "planning": "logistics", "vehicles": "vehicles", "venues": "venues", "geocode": "venues",
+         "logistics": "logistics", "loading": "logistics", "deliveries": "logistics", "planning": "logistics", "work-orders": "works", "work-templates": "works", "work-recurrences": "works", "work-types": "works", "vehicles": "vehicles", "venues": "venues", "geocode": "venues",
          "providers": "providers", "provider-categories": "providers", "provider-documents": "providers", "provider-unavailabilities": "providers", "service-requests": "providers",
          "message-templates": "providers", "missions": "providers", "staff": "staff", "staff-teams": "staff", "positions": "staff", "applications": "staff", "timesheets": "staff",
          "payroll-export": "staff", "provider-invoices": "staff", "music-plans": "music", "messaging": "messages", "inbound-requests": "inbound", "tasks": "tasks", "team": "team",
@@ -29,7 +29,7 @@ EVENT_SUB = {"dj": "providers", "quotes": "quotes", "quote-candidates": "quotes"
 ER, EW, FR, FW, CR, CW, PM, UM, OW = "events:read", "events:write", "finance:read", "finance:write", "catalog:read", "catalog:write", "providers:manage", "users:manage", "org:write"
 # droit historique principal de chaque module : (voir, écrire) ; None = seule la grille décide
 PRIM = {"finance": ("pilot:view", "pilot:manage"), "social": ("social:view", "social:manage"), "communication": ("comms:view", "comms:manage"), "events": (ER, EW), "contacts": ("contacts:read", "contacts:write"), "crm": ("crm:manage", "crm:manage"), "quotes": (FR, FR), "invoices": (FR, FW), "accounting": (FR, FW),
-        "purchases": (FR, FW), "expenses": (ER, None), "catalog": (CR, CW), "stock": (CR, CW), "logistics": (ER, EW), "vehicles": (ER, CW), "venues": ("venues:read", "venues:write"),
+        "purchases": (FR, FW), "expenses": (ER, None), "catalog": (CR, CW), "stock": (CR, CW), "logistics": (ER, EW), "works": (ER, CW), "vehicles": (ER, CW), "venues": ("venues:read", "venues:write"),
         "providers": (PM, PM), "staff": (PM, PM), "music": (ER, None), "messages": ("messages:read", "messages:write"), "inbound": (ER, EW), "tasks": (ER, None),
         "team": ("team:read", "team:write"), "portals": (UM, UM), "users": (UM, UM), "settings": (OW, OW)}
 SPECIAL = {("events", "delete"): "events:delete", ("expenses", "validate"): FW}
