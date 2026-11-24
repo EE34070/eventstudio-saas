@@ -239,7 +239,7 @@ export default function TravauxInternes() {
   return (
     <div data-testid="works-page">
       <PageHeader title="Travaux internes" subtitle="Construction, rangement d'entrepôt, inventaires, réparations, atelier retour, entretien des véhicules : le travail des équipes hors événements."
-        actions={write && <Button onClick={() => { setSiblings(null); setEdit({}); }} data-testid="new-work-button"><Plus />Travail</Button>} />
+        actions={<div className="flex gap-2"><Button variant="outline" asChild><Link to="/planning?vue=equipe" data-testid="works-to-planning">Planning de l'équipe</Link></Button>{write && <Button onClick={() => { setSiblings(null); setEdit({}); }} data-testid="new-work-button"><Plus />Travail</Button>}</div>} />
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <div className="flex rounded-full border border-border bg-card p-1">{TABS.map(([k, l]) => <button key={k} onClick={() => setTab(k)} className={pill(tab === k)} data-testid={`works-tab-${k}`}>{l}</button>)}</div>
         {!["templates", "recurrences"].includes(tab) && <select className="h-9 rounded-full border border-border bg-card px-3 text-xs" value={type} onChange={(e) => setType(e.target.value)} data-testid="works-type-filter">

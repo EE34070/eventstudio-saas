@@ -257,6 +257,8 @@ app.include_router(routes_pack_i18n.router)
 app.include_router(routes_dj_conflicts.router)
 import routes_works  # noqa: E402
 app.include_router(routes_works.router)
+import routes_works_planning  # noqa: E402
+app.include_router(routes_works_planning.router)
 import routes_schedule  # noqa: E402
 app.include_router(routes_schedule.router)
 import routes_reuse  # noqa: E402
