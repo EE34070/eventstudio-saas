@@ -1,0 +1,45 @@
+export const MENU = {
+  home: ["Home", "Accueil"], info: ["Our information", "Nos informations"], quest: ["Our questionnaire", "Notre questionnaire"],
+  vendors: ["Our vendors", "Nos prestataires"], guests: ["Guest list", "Guest list"], seating: ["Seating plan", "Plan de table"],
+  food: ["Food and drinks", "Repas et boissons"], budget: ["Budget and payments", "Budget et paiements"],
+  group_photos: ["Group photos", "Photos de groupe"], music: ["Music", "Musiques"], design: ["Design and atmosphere", "Design et ambiance"],
+  planning: ["Planning", "Planning"], documents: ["Summary and documents", "Récapitulatif et documents"],
+};
+
+export const C = {
+  en: { welcome: "Welcome", togo: "days to go", s1: "Step 1", s2: "Step 2", i: "Your information", id: "Check your details, the date and the ceremony.",
+    complete: "Complete", todo: "To complete", q: "Your questionnaire", qd: "Tell us your story and your wishes. It helps your wedding planner a lot.",
+    qdone: "Completed", qtodo: "To fill in", next: "What is coming next", nextd: "These parts of your space open step by step, as your planning moves forward.",
+    soon: "Coming soon", qt: "Our questionnaire", qp: "Take your time. You can stop and come back, your answers are saved.",
+    qh: "Your questionnaire opens here", qnone: "Your questionnaire is not available yet. Your wedding planner will open it very soon.",
+    edit: "Open in a new tab", qn: "Your answers go straight to your wedding planner. You do not need to send anything.",
+    known: "Already in your information, no need to repeat it:", it: "Our information", ip: "Please check that everything is right. Your wedding planner sees your changes.",
+    saved: "Saved. Your wedding planner sees the changes.", dateTbc: "Date to be confirmed",
+    space: "Your wedding space", missing: "This space is not available.",
+    knownLabels: { budget: "budget", guests: "number of guests", "ceremony.type": "type of ceremony", "ceremony.place": "ceremony location", "ceremony.time": "ceremony time", jobs: "professions" } },
+  fr: { welcome: "Bienvenue", togo: "jours restants", s1: "Étape 1", s2: "Étape 2", i: "Vos informations", id: "Vérifiez vos coordonnées, la date et la cérémonie.",
+    complete: "Complet", todo: "À compléter", q: "Votre questionnaire", qd: "Racontez-nous votre histoire et vos envies. Cela aide beaucoup votre wedding planner.",
+    qdone: "Rempli", qtodo: "À remplir", next: "La suite", nextd: "Ces parties de votre espace s'ouvrent au fil de l'avancement de votre organisation.",
+    soon: "Bientôt", qt: "Notre questionnaire", qp: "Prenez votre temps. Vous pouvez vous arrêter et revenir, vos réponses sont enregistrées.",
+    qh: "Votre questionnaire s'ouvre ici", qnone: "Votre questionnaire n'est pas encore disponible. Votre wedding planner l'ouvre très bientôt.",
+    edit: "Ouvrir dans un nouvel onglet", qn: "Vos réponses arrivent directement chez votre wedding planner. Vous n'avez rien à envoyer.",
+    known: "Déjà dans vos informations, inutile de le redire :", it: "Nos informations", ip: "Vérifiez que tout est juste. Votre wedding planner voit vos modifications.",
+    saved: "Enregistré. Votre wedding planner voit les modifications.", dateTbc: "Date à confirmer",
+    space: "Votre espace mariage", missing: "Cet espace n'est pas disponible.",
+    knownLabels: { budget: "budget", guests: "nombre d'invités", "ceremony.type": "type de cérémonie", "ceremony.place": "lieu de la cérémonie", "ceremony.time": "horaire de la cérémonie", jobs: "professions" } },
+};
+
+export const FD = {
+  en: { t: "Food and drinks", p: "Everything about your meals and drinks, event by event. Your caterer and your wedding planner fill it in with you.",
+    vendor: "Your caterer", valid: "Validated", formula: "Formula", price: "Price", menu: "Menu", chosen: "Chosen", options: "Options",
+    inc: "Drinks included", ext: "Drinks from another supplier", item: "Drink", sup: "Supplier", ratio: "Per guest", qty: "Quantity to order",
+    guests: "guests", diet: "Dietary needs for this event", from: "From your guest list", none: "They will appear here once your guest list is open.",
+    allergy: "Allergy", pick: "First, choose your caterer", pickd: "Once a caterer is validated for this event, the menu and the drinks open here.",
+    off: "This event is not part of your wedding.", children: "Children", unit: { bottle: "bottles", keg: "kegs", l: "litres" } },
+  fr: { t: "Repas et boissons", p: "Tout sur vos repas et vos boissons, événement par événement. Votre traiteur et votre wedding planner le complètent avec vous.",
+    vendor: "Votre traiteur", valid: "Validé", formula: "Formule", price: "Prix", menu: "Menu", chosen: "Choisi", options: "Options",
+    inc: "Boissons incluses", ext: "Boissons d'un autre fournisseur", item: "Boisson", sup: "Fournisseur", ratio: "Par invité", qty: "Quantité à commander",
+    guests: "invités", diet: "Contraintes alimentaires pour cet événement", from: "Depuis votre Guest List", none: "Elles s'afficheront ici dès que votre Guest List sera ouverte.",
+    allergy: "Allergie", pick: "Choisissez d'abord votre traiteur", pickd: "Dès qu'un traiteur est validé pour cet événement, le menu et les boissons s'ouvrent ici.",
+    off: "Cet événement ne fait pas partie de votre mariage.", children: "Enfants", unit: { bottle: "bouteilles", keg: "fûts", l: "litres" } },
+};

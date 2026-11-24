@@ -12,6 +12,7 @@ import { makeT } from "@/portal/tr";
 import { MySocial } from "@/pages/MonEspace";
 import { StaffHome, Positions, Agenda, Space } from "@/portal/Staff";
 import { DjSpace, ClientDj } from "@/portal/Dj";
+import CoupleSpace, { loadWedding } from "@/wedding/CoupleSpace";
 
 const ICON = { Home, Music, FileText, Receipt, Clock, MessageCircle, Users };
 const P = createContext(null);
@@ -278,20 +279,25 @@ export default function Portal({ viewAs }) {
   const [lang, setLang] = useState(null);
   const [tabs, setTabs] = useState([]);
   const [tab, setTab] = useState(null);
+  const [wedding, setWedding] = useState(undefined); // espace mariage (module Wedding planner) : prioritaire pour les mariés
+  const [classic, setClassic] = useState(false);
   const reload = useCallback(() => api.get("/portal/me").then((r) => { setMe(r.data); setLang((l) => (viewAs && l) || r.data.language); }).catch(() => toast.error("Erreur / Error")), [viewAs]);
   useEffect(() => { if (viewAs) api.defaults.headers.common["X-View-As"] = viewAs; reload(); return () => { delete api.defaults.headers.common["X-View-As"]; }; }, [viewAs, reload]);
   const tr = useMemo(() => makeT(lang || "fr-FR"), [lang]);
+  useEffect(() => { if (me?.role === "client" && !me.terms_required) loadWedding().then(setWedding); else if (me) setWedding(null); }, [me]);
   if (!me || !lang) return null;
   const { t } = tr;
   if (me.terms_required) return <Terms me={me} tr={tr} reload={reload} />;
   const client = me.role === "client";
+  if (client && wedding === undefined) return null;
+  if (client && wedding && !classic) return <CoupleSpace home={wedding} onClassic={() => { setClassic(true); setTab("home"); }} onAccount={() => { setClassic(true); setTab("account"); }} />;
   const cur = tab || "home";
   const nav = client ? tabs : PROVIDER_TABS.map(([k, icon]) => ({ key: k, label: t(`tab_${k}`), icon }));
   return (
     <P.Provider value={{ ...tr, me, reload, preview: me.preview, setTabs, tab: cur, setTab }}>
       <div className="mx-auto min-h-screen max-w-xl bg-background px-4 pb-32 pt-4" data-testid={`portal-${me.role}`}>
         {me.preview && <div className="mb-3 flex items-center justify-between rounded-2xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white" data-testid="preview-banner">{t("preview_banner")}<button className="underline" onClick={() => setLang(lang.startsWith("fr") ? "en-US" : "fr-FR")} data-testid="preview-lang">{lang.startsWith("fr") ? "EN" : "FR"}</button></div>}
-        <header className="mb-4 flex items-center justify-between"><span className="font-brand text-lg">{me.org.name}</span><span className="text-sm text-muted-foreground">{me.name}</span></header>
+        <header className="mb-4 flex items-center justify-between"><span className="font-brand text-lg">{me.org.name}</span>{wedding && classic ? <button className="text-sm underline" onClick={() => setClassic(false)} data-testid="back-to-wedding">{lang.startsWith("fr") ? "Mon espace mariage" : "My wedding space"}</button> : <span className="text-sm text-muted-foreground">{me.name}</span>}</header>
         {cur === "account" ? <Account /> : client ? <Client /> : cur === "home" ? <StaffHome tr={tr} go={setTab} /> : cur === "dj" ? <DjSpace tr={tr} /> : cur === "missions" ? <div className="space-y-6"><Missions /><Positions tr={tr} /><Requests /></div> : cur === "agenda" ? <div className="space-y-4"><Agenda tr={tr} preview={me.preview} /><Calendar /></div> : cur === "documents" ? <ProviderDocs /> : <div className="space-y-4"><Space tr={tr} preview={me.preview} /><MySocial base="/portal/provider/social" portal /><Profile /><Account /></div>}
         <footer className="mt-8 text-center text-xs text-muted-foreground"><Link className="underline" target="_blank" to={`/legal/${me.org.id}/privacy`}>{t("privacy")}</Link> · <Link className="underline" target="_blank" to={`/legal/${me.org.id}/legal`}>{t("legal")}</Link></footer>
         <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-xl overflow-x-auto rounded-3xl border border-border bg-card px-1.5 py-2 shadow-lg" data-testid="portal-nav">

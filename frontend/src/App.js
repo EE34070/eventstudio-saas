@@ -60,6 +60,9 @@ const ReponsePartenaire = lazy(() => import("@/pages/ReponsePartenaire"));
 const Social = lazy(() => import("@/pages/Social"));
 const MonEspace = lazy(() => import("@/pages/MonEspace"));
 const Relances = lazy(() => import("@/pages/Relances"));
+const Mariages = lazy(() => import("@/wedding/Dashboard"));
+const MariageDossier = lazy(() => import("@/wedding/WeddingFile"));
+const MariagesReglages = lazy(() => import("@/wedding/Settings"));
 
 const SOON = ["compta", "commercial", "documents", "ecrans"];
 
@@ -79,7 +82,7 @@ function ChoosePassword({ user, onDone }) {
 }
 
 function Gate() {
-  const { me, error, can } = useMe();
+  const { me, error, can, modules = [] } = useMe();
   const { user } = useUser();
   const [pwDone, setPwDone] = useState(false);
   useEffect(() => { if (user && localStorage.getItem(`pw-skip-${user.id}`)) setPwDone(true); }, [user]);
@@ -127,6 +130,7 @@ function Gate() {
         <Route path="mon-espace" element={<MonEspace />} />
         {can("comms:view") && <Route path="communication" element={<Communication />} />}
         <Route path="musique-plans" element={<Musique />} />
+        {modules.includes("wedding_planner") && can("events:read") && <><Route path="mariages" element={<Mariages />} /><Route path="mariages/reglages" element={<MariagesReglages />} /><Route path="mariages/:id" element={<MariageDossier />} /></>}
         {can("providers:manage") && <Route path="staff" element={<StaffAdmin />} />}
         {can("providers:manage") && <Route path="dj" element={<DjAdmin />} />}
         {(can("users:manage") || can("org:write")) && <Route path="parametres" element={<Parametres />} />}
