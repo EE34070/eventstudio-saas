@@ -33,3 +33,12 @@ async def test_split_single_database(capsys):
     assert await src.contacts.count_documents({}) == 3  # source intacte
     out = capsys.readouterr().out
     assert "strays: 1" in out and "aucun écart" in out
+
+
+async def test_split_on_boot_skips_when_destination_filled(monkeypatch):
+    import server
+    tenants.init(tenants.Clusters({"default": AsyncMongoMockClient()}, "platform"))
+    await tenants.CLUSTERS.control.orgs.insert_one({"id": "deja-la"})
+    monkeypatch.setenv("SRC_MONGO_URL", "mongodb://ne-doit-pas-etre-contacte")
+    await server._split_on_boot()  # ne lève rien et ne touche pas la source
+    assert await tenants.CLUSTERS.control.orgs.count_documents({}) == 1

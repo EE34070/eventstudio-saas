@@ -287,9 +287,25 @@ app.add_middleware(
 )
 
 
+async def _split_on_boot() -> None:
+    """Préproduction uniquement : migration à blanc de la base unique (SRC_MONGO_URL / SRC_DB)
+    vers la base plateforme + une base par société, au démarrage, si la destination est vide.
+    La source n'est jamais modifiée. Rapport dans les journaux Render."""
+    if os.environ.get("ENV", "").lower() == "production":
+        raise RuntimeError("SPLIT_ON_BOOT interdit en production : utilisez scripts_saas/split_tenants.py")
+    if await tenants.CLUSTERS.control.orgs.count_documents({}):
+        logger.info("SPLIT_ON_BOOT : destination déjà remplie, migration ignorée")
+        return
+    from scripts_saas import split_tenants
+    code = await split_tenants.main(apply=True, force=False, clusters=True)
+    logger.warning("SPLIT_ON_BOOT terminé : %s", "aucun écart" if code == 0 else "ÉCARTS, voir le rapport ci-dessus")
+
+
 @app.on_event("startup")
 async def startup():
     import migrations
+    if os.environ.get("SPLIT_ON_BOOT", "").lower() == "true":
+        await _split_on_boot()
     await tenants.assert_split_done()
     await tenants.load_placements()
     await seed_module_defs()
