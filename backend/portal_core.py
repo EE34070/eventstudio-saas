@@ -48,7 +48,7 @@ def today() -> str:
 
 def _clerk(method: str, path: str, **kw):
     r = requests.request(method, "https://api.clerk.com/v1" + path, timeout=15, **kw,
-                         headers={"Authorization": f"Bearer {os.environ['CLERK_SECRET_KEY']}", "Content-Type": "application/json", "User-Agent": "emergent-app"})
+                         headers={"Authorization": f"Bearer {os.environ['CLERK_SECRET_KEY']}", "Content-Type": "application/json", "User-Agent": "eventstudio"})
     if r.status_code >= 400:
         raise HTTPException(502, "Le service de connexion a refusé l'opération : " + r.text[:160])
     return r.json() if r.content else {}

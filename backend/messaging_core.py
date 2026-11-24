@@ -103,13 +103,13 @@ def google_ready() -> bool:
 
 
 def llm_provider() -> str:
-    return (os.environ.get("LLM_PROVIDER") or "emergent").strip().lower()
+    return (os.environ.get("LLM_PROVIDER") or "anthropic").strip().lower()
 
 
 def llm_key() -> str:
-    """anthropic : LLM_API_KEY (appel direct). emergent (aperçu) : clé Anthropic de l'aperçu."""
+    """Clé de l'API Anthropic, appel direct (LLM_API_KEY, ou ANTHROPIC_API_KEY)."""
     e = os.environ.get
-    return (e("LLM_API_KEY") or e("ANTHROPIC_API_KEY") or "") if llm_provider() == "anthropic" else (e("ANTHROPIC_API_KEY") or e("LLM_API_KEY") or "")
+    return e("LLM_API_KEY") or e("ANTHROPIC_API_KEY") or ""
 
 
 def ai_ready() -> bool:

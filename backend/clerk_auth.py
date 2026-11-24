@@ -107,7 +107,7 @@ def _jwks_client(secret_key: str) -> jwt.PyJWKClient:
     return jwt.PyJWKClient(
         url,
         # Clerk's edge rejects urllib's default User-Agent (Cloudflare 1010).
-        headers={**auth, "User-Agent": "emergent-clerk-auth"},
+        headers={**auth, "User-Agent": "eventstudio"},
         lifespan=3600,
         timeout=10,
     )

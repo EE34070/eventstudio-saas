@@ -15,9 +15,7 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
-EMAIL_BASE_URL = "https://integrations.emergentagent.com"
-EMAIL_PROVIDER = (os.environ.get("EMAIL_PROVIDER") or "emergent").strip().lower()
-EMAIL_KEY = os.environ.get("EMERGENT_EMAIL_KEY", "")
+EMAIL_PROVIDER = (os.environ.get("EMAIL_PROVIDER") or "resend").strip().lower()  # resend | smtp
 EMAIL_FROM_NAME = os.environ.get("EMAIL_FROM_NAME") or ""
 
 
@@ -156,26 +154,6 @@ async def _send_other(to: str, subject: str, html: str, reply_to: str | None, at
 
 async def send_email(*, to: str, subject: str, html: str, reply_to: str | None = None, attachments: list | None = None) -> str | None:
     _assert_safe_email(subject, html)
-    if EMAIL_PROVIDER in ("resend", "smtp"):
-        return await _send_other(to, subject, html, reply_to, attachments)
-    payload = {"to": [to], "subject": subject, "html": html, "from_name": EMAIL_FROM_NAME}
-    if reply_to:
-        payload["contact_email"] = reply_to
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(f"{EMAIL_BASE_URL}/api/v1/email/send", headers={"X-Email-Key": EMAIL_KEY}, json=payload)
-        resp.raise_for_status()
-        return resp.json().get("id")
-    except httpx.HTTPStatusError as e:
-        try:
-            code = e.response.json().get("code", "")
-        except ValueError:
-            code = ""
-        if code in ("insufficient_credits", "integration_disabled", "daily_limit_reached"):
-            logger.warning(f"Email paused: {code} ({e.response.status_code}): {e.response.json().get('message', '')}")
-            raise HTTPException(status_code=503, detail="L'envoi d'e-mails est momentanément indisponible")
-        logger.error(f"Email send failed: {e.response.status_code} {e.response.text}")
-        raise HTTPException(status_code=502, detail="L'e-mail n'a pas pu être envoyé")
-    except Exception as e:
-        logger.error(f"Email send error: {str(e)}")
-        raise HTTPException(status_code=500, detail="L'e-mail n'a pas pu être envoyé")
+    if EMAIL_PROVIDER not in ("resend", "smtp"):
+        raise HTTPException(503, "Envoi d'e-mails non configuré : EMAIL_PROVIDER doit valoir resend ou smtp")
+    return await _send_other(to, subject, html, reply_to, attachments)

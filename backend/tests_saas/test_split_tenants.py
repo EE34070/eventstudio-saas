@@ -42,3 +42,14 @@ async def test_split_on_boot_skips_when_destination_filled(monkeypatch):
     monkeypatch.setenv("SRC_MONGO_URL", "mongodb://ne-doit-pas-etre-contacte")
     await server._split_on_boot()  # ne lève rien et ne touche pas la source
     assert await tenants.CLUSTERS.control.orgs.count_documents({}) == 1
+
+
+async def test_orphans_attached_to_default_company():
+    src = AsyncMongoMockClient()["legacy2"]
+    await src.orgs.insert_many([{"id": "org-1", "slug": "exclusivity-events"}, {"id": "org-2", "slug": "autre"}])
+    await src.import_catalogue_odoo.insert_many([{"ref": "A"}, {"ref": "B"}])
+    tenants.init(tenants.Clusters({"default": AsyncMongoMockClient()}, "platform"))
+    assert await split_tenants.main(apply=True, force=False, src=src, clusters=True, default_org_slug="exclusivity-events") == 0
+    docs = await tenants.CLUSTERS.tenant("org-1").import_catalogue_odoo.find({}).to_list(None)
+    assert len(docs) == 2 and all(d["org_id"] == "org-1" for d in docs)
+    assert await tenants.CLUSTERS.tenant("org-2").import_catalogue_odoo.count_documents({}) == 0

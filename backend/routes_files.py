@@ -8,14 +8,11 @@ from core import Ctx, db, need, new_id, now_iso
 
 from core import check_expiry, ensure_link, link_doc, link_limit  # noqa: E402,F401
 router = APIRouter(prefix="/api")
-STORAGE_BASE = (os.environ.get("INTEGRATION_PROXY_URL") or "").strip() or "https://integrations.emergentagent.com"
-STORAGE_URL = STORAGE_BASE.rstrip("/") + "/objstore/api/v1/storage"
 APP_NAME = "exclusivity-erp"
 MAX_SIZE = 15 * 1024 * 1024
 TYPES = {"image/jpeg": ("jpg", b"\xff\xd8"), "image/png": ("png", b"\x89PNG"), "image/webp": ("webp", b"RIFF"),
          "application/pdf": ("pdf", b"%PDF")}
-_key = None
-PROVIDER = (os.environ.get("STORAGE_PROVIDER") or "emergent").strip().lower()
+PROVIDER = (os.environ.get("STORAGE_PROVIDER") or "s3").strip().lower()  # s3 (R2, S3…) | local (développement)
 LOCAL_DIR = os.path.realpath(os.environ.get("LOCAL_STORAGE_DIR") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads"))
 _s3 = None
 
@@ -47,7 +44,7 @@ def _put(path: str, data: bytes, ctype: str) -> str:
         with open(full, "wb") as fh:
             fh.write(data)
         return path
-    return _call("PUT", path, {"Content-Type": ctype}, data=data).json()["path"]
+    raise RuntimeError(f"STORAGE_PROVIDER inconnu : {PROVIDER} (s3 ou local)")
 
 
 def _get(path: str) -> bytes:
@@ -56,27 +53,7 @@ def _get(path: str) -> bytes:
     if PROVIDER == "local":
         with open(_local(path), "rb") as fh:
             return fh.read()
-    return _call("GET", path).content
-
-
-def _init(force: bool = False) -> str:
-    global _key
-    if _key and not force:
-        return _key
-    r = requests.post(f"{STORAGE_URL}/init", json={"emergent_key": os.environ["EMERGENT_LLM_KEY"]}, timeout=30)
-    r.raise_for_status()
-    _key = r.json()["storage_key"]
-    return _key
-
-
-def _call(method: str, path: str, headers: dict | None = None, **kw) -> requests.Response:
-    for attempt in (0, 1):
-        r = requests.request(method, f"{STORAGE_URL}/objects/{path}", timeout=120,
-                             headers={**(headers or {}), "X-Storage-Key": _init(force=attempt == 1)}, **kw)
-        if r.status_code != 404 or attempt or method != "PUT":
-            break
-    r.raise_for_status()
-    return r
+    raise RuntimeError(f"STORAGE_PROVIDER inconnu : {PROVIDER} (s3 ou local)")
 
 
 async def read_upload(file: UploadFile) -> tuple:

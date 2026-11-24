@@ -14,7 +14,8 @@ Règles :
   - collections plateforme (tenant_router.PLATFORM) : copiées telles quelles dans CONTROL_DB
   - autres collections : chaque document va dans t_<org_id> selon son champ org_id
   - documents sans org_id : rattachés quand c'est possible (sync_queue -> via channel_accounts,
-    schema_migrations -> copié dans chaque société), sinon listés et NON copiés
+    schema_migrations -> copié dans chaque société, sinon à la société --default-org-slug si
+    elle est donnée), sinon listés et NON copiés
   - empreintes de liens publics (share_hash, token_hash…) indexées dans platform.link_index
   - index de chaque base créés (mêmes définitions que server.INDEXES)
 """
@@ -36,7 +37,7 @@ COPY_TO_EVERY_TENANT = {"schema_migrations"}  # état des migrations : identique
 BATCH = 500
 
 
-async def main(apply: bool, force: bool, src=None, clusters=None) -> int:
+async def main(apply: bool, force: bool, src=None, clusters=None, default_org_slug: str | None = None) -> int:
     src = src if src is not None else AsyncIOMotorClient(os.environ["SRC_MONGO_URL"])[os.environ["SRC_DB"]]
     if clusters is None:
         tenants.init(tenants.Clusters.from_env())
@@ -45,6 +46,10 @@ async def main(apply: bool, force: bool, src=None, clusters=None) -> int:
 
     orgs = [o async for o in src.orgs.find({}, {"_id": 0})]
     org_ids = {o["id"] for o in orgs}
+    default_org_slug = default_org_slug or os.environ.get("SPLIT_DEFAULT_ORG_SLUG") or None
+    default_org = next((o["id"] for o in orgs if o.get("slug") == default_org_slug), None) if default_org_slug else None
+    if default_org_slug and not default_org:
+        sys.exit(f"Société « {default_org_slug} » introuvable pour les documents sans société")
     print(f"Sociétés : {len(orgs)} — " + ", ".join(o.get("name", o["id"]) for o in orgs))
 
     if apply and not force:
@@ -85,6 +90,8 @@ async def main(apply: bool, force: bool, src=None, clusters=None) -> int:
                     buffers[oid].append(dict(d))
                     counts[oid] += 1
                 continue
+            if org_id not in org_ids and default_org and not org_id:
+                org_id = d["org_id"] = default_org  # base historique mono-société : rattachement explicite
             if org_id not in org_ids:
                 orphans[coll] += 1
                 continue
@@ -151,5 +158,6 @@ if __name__ == "__main__":
     g.add_argument("--dry-run", action="store_true")
     g.add_argument("--apply", action="store_true")
     p.add_argument("--force", action="store_true")
+    p.add_argument("--default-org-slug", help="société à qui rattacher les documents sans org_id (ex. exclusivity-events)")
     a = p.parse_args()
-    sys.exit(asyncio.run(main(a.apply, a.force)))
+    sys.exit(asyncio.run(main(a.apply, a.force, default_org_slug=a.default_org_slug)))

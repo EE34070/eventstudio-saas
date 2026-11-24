@@ -28,10 +28,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
-      - name: litellm ne doit pas être figé (emergentintegrations l'installe ; utiliser scripts/freeze.sh)
-        run: "! grep -qi '^litellm' requirements.txt"
-      - name: Installation depuis requirements.txt (environnement vierge)
-        run: pip install -r requirements.txt --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/
+      - name: Installation depuis requirements.txt (PyPI uniquement, sans dépôt Emergent)
+        run: pip install -r requirements.txt
       - name: pip-audit
         run: pip install pip-audit && pip-audit -r requirements.txt --disable-pip --no-deps
       - name: Démarrage et contrôle de santé

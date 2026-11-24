@@ -84,7 +84,18 @@ leur société, invisibilité entre sociétés, cluster dédié, refus sans soci
 chaque tâche planifiée et chaque cron, offres et lecture seule, inscription, migration.
 Les tests historiques `backend/tests/` (bout en bout avec un vrai serveur et Clerk) restent valables.
 
-## 5. Reste à faire
+## 5. Indépendance vis-à-vis d'Emergent
+
+Le SaaS ne dépend plus d'aucun service Emergent :
+- e-mails : `EMAIL_PROVIDER=resend` (défaut) ou `smtp` ;
+- fichiers : `STORAGE_PROVIDER=s3` (défaut, Cloudflare R2 ou tout stockage S3) ou `local` en développement ;
+- IA : appel direct à l'API Anthropic (`LLM_API_KEY`) ;
+- dépendances : uniquement PyPI (plus de dépôt Emergent, plus de `emergentintegrations`).
+
+Migration : `--default-org-slug exclusivity-events` (ou `SPLIT_DEFAULT_ORG_SLUG`) rattache à cette
+société les documents historiques sans `org_id` (ex. `import_catalogue_odoo`).
+
+## 6. Reste à faire
 
 - Scripts d'exploitation historiques (`scripts/purge_*.py`, `migrate_org.py`, `backup_mongo.py`) :
   écrits pour une base unique, à adapter (boucle `for_each_org`).
