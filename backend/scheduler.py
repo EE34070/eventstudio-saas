@@ -46,5 +46,7 @@ def start() -> AsyncIOScheduler:
     s.add_job(locked("works-recurrence", 3600, routes_works.tick), "cron", hour=4, minute=10)
     import routes_communication
     s.add_job(locked("comms-tick", 840, routes_communication.tick), "interval", minutes=15, max_instances=1, coalesce=True)
+    import wedding_core
+    s.add_job(locked("wedding-forms", 840, wedding_core.tick), "interval", minutes=15, max_instances=1, coalesce=True)
     s.start()
     return s

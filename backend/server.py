@@ -265,6 +265,10 @@ import routes_quote_docs  # noqa: E402
 app.include_router(routes_quote_docs.router)
 import routes_supplier_quotes  # noqa: E402
 app.include_router(routes_supplier_quotes.router)
+import routes_wedding  # noqa: E402
+app.include_router(routes_wedding.router)
+for _coll, _keys in routes_wedding.INDEXES.items():  # module Wedding planner : index des bases société
+    INDEXES.setdefault(_coll, []).extend(IndexModel(k, name="_".join(f"{f}_{d}" for f, d in k)) for k in _keys)
 import routes_dj  # noqa: E402
 app.include_router(routes_dj.router)
 import access_grid  # noqa: E402
