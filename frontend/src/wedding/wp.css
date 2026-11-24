@@ -1,0 +1,89 @@
+/* Module Wedding planner — design de la maquette validée (phase 1).
+   Les couleurs et polices viennent de l'image de marque de l'organisation (--b-*) ;
+   les valeurs ci-dessous sont celles de la maquette, utilisées par défaut.
+   Règles : aucun arrondi, aucune ombre, pas de noir pur, beaucoup d'espace. */
+.wp {
+  --g: var(--b-primary, #1F3D2B); --cr: var(--b-bg, #F2F1EB); --cr2: var(--b-surface, #FAF9F5);
+  --tx: var(--b-ink, #4b5c4c); --lb: var(--b-muted, #6b7a63); --ln: var(--b-line, #cdd6c6);
+  --sf: var(--b-soft, #a9c0ac); --al: var(--b-alert, #9a3b2e);
+  --dsp: var(--b-display, 'Cormorant Garamond', Georgia, serif); --bdy: var(--b-body, 'Montserrat', system-ui, sans-serif);
+  color: var(--tx); font: 300 15px/1.55 var(--bdy);
+}
+.wp *, .wp *::before, .wp *::after { box-sizing: border-box; border-radius: 0; }
+.wp h1, .wp h2, .wp h3 { font-family: var(--dsp); font-style: italic; font-weight: 500; color: var(--g); margin: 0; }
+.wp h1 { font-size: 40px; line-height: 1.15; } .wp h2 { font-size: 30px; } .wp h3 { font-size: 22px; }
+.wp p { margin: 8px 0; }
+.wp .kicker { font-size: 11px; letter-spacing: 2.2px; text-transform: uppercase; color: var(--lb); }
+.wp button:focus-visible, .wp input:focus-visible, .wp select:focus-visible, .wp textarea:focus-visible, .wp a:focus-visible,
+.wp [tabindex]:focus-visible { outline: 2px solid var(--g); outline-offset: 2px; }
+.wp .btn { background: var(--g); color: var(--cr); border: 1px solid var(--g); border-radius: 0; padding: 9px 15px;
+  font: 400 11px var(--bdy); letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; min-height: 36px; }
+.wp .btn.ghost { background: transparent; color: var(--g); }
+.wp .btn:disabled { opacity: .5; cursor: default; }
+.wp .btn.small { padding: 5px 10px; min-height: 0; }
+.wp input, .wp select, .wp textarea { font: 300 14px var(--bdy); color: var(--tx); background: var(--cr2); border: 1px solid var(--ln);
+  border-radius: 0; padding: 8px 10px; width: 100%; }
+.wp input[type=checkbox] { width: auto; accent-color: var(--g); }
+.wp input:disabled { opacity: .7; }
+.wp textarea { min-height: 84px; resize: vertical; }
+.wp label.l { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--lb); margin: 14px 0 4px; }
+.wp .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 18px; }
+.wp .card { background: var(--cr2); border: 1px solid var(--ln); padding: 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; text-align: left; font: inherit; color: inherit; }
+.wp .card.click { cursor: pointer; } .wp .card.click:hover { border-color: var(--g); }
+.wp .card.lock { opacity: .55; }
+.wp .card.add { justify-content: center; align-items: center; text-align: center; border-style: dashed; border-color: var(--sf); }
+.wp .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wp .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.wp .spread { justify-content: space-between; }
+.wp .bar { height: 6px; background: var(--ln); } .wp .bar i { display: block; height: 100%; background: var(--g); }
+.wp .pill { display: inline-block; border: 1px solid var(--ln); padding: 2px 9px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--lb); }
+.wp .pill.ok { background: var(--g); color: var(--cr); border-color: var(--g); }
+.wp .pill.warn { border-color: var(--al); color: var(--al); }
+.wp .sec { border: 1px solid var(--ln); background: var(--cr2); padding: 20px; margin-top: 16px; }
+.wp .tablewrap { overflow-x: auto; }
+.wp table { border-collapse: collapse; width: 100%; min-width: 520px; background: transparent; }
+.wp th, .wp td { border: 1px solid var(--ln); padding: 10px; text-align: left; font-size: 14px; vertical-align: middle; }
+.wp th { background: var(--cr2); font-weight: 500; color: var(--g); }
+.wp td.num { text-align: right; white-space: nowrap; }
+.wp .note { border-left: 3px solid var(--sf); background: var(--cr2); padding: 10px 14px; font-size: 13px; margin: 16px 0; }
+.wp .qa { border-top: 1px solid var(--ln); padding: 12px 0; } .wp .qa:first-of-type { border-top: 0; }
+.wp .qa .q { font-size: 12px; color: var(--lb); margin-bottom: 2px; }
+.wp .tog { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--ln); padding: 10px 0; gap: 10px; }
+.wp .hero { background: var(--g); color: var(--cr); padding: 34px 26px; }
+.wp .hero h1 { color: var(--cr); } .wp .hero .kicker { color: color-mix(in srgb, var(--cr) 80%, var(--g)); }
+.wp .big { font-family: var(--dsp); font-style: italic; font-size: 46px; color: var(--cr); line-height: 1; }
+.wp .back { background: none; border: 0; color: var(--lb); font: 400 11px var(--bdy); letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; padding: 0; margin-bottom: 12px; }
+.wp .empty { border: 1px dashed var(--sf); padding: 40px 20px; text-align: center; margin-top: 16px; }
+.wp .muted { color: var(--lb); font-size: 13px; }
+.wp .strong { font-weight: 500; color: var(--g); }
+.wp details > summary { cursor: pointer; list-style: none; } .wp details > summary::-webkit-details-marker { display: none; }
+.wp details > summary h3::after { content: " +"; font-style: normal; color: var(--lb); font-size: 16px; }
+.wp details[open] > summary h3::after { content: " −"; }
+.wp .files a { color: var(--g); }
+.wp .proposal { border: 1px dashed var(--sf); padding: 10px; margin-top: 10px; font-size: 13px; white-space: pre-wrap; }
+.wp-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--g, #1F3D2B); color: var(--cr, #F2F1EB);
+  padding: 10px 18px; font: 300 13px var(--bdy, system-ui); z-index: 30; }
+.wp-modal { position: fixed; inset: 0; background: color-mix(in srgb, var(--g) 45%, transparent); display: flex; justify-content: center;
+  align-items: flex-start; padding: 20px; overflow: auto; z-index: 20; }
+.wp-modal > div { background: var(--cr); width: min(560px, 100%); padding: 24px; border: 1px solid var(--ln); }
+.wp .notif { position: absolute; right: 0; top: 44px; width: min(380px, calc(100vw - 40px)); background: var(--cr); border: 1px solid var(--g); z-index: 10; padding: 14px; text-align: left; }
+.wp .notif .n { padding: 10px 0; border-top: 1px solid var(--ln); font-size: 13px; }
+.wp .notif .n.unread { color: var(--g); font-weight: 400; }
+/* Espace des mariés : en-tête propre (pas de barre latérale du socle) */
+.wp-couple { min-height: 100vh; background: var(--cr); }
+.wp-couple header { background: var(--cr); border-bottom: 1px solid var(--ln); padding: 16px 20px 0; position: sticky; top: 0; z-index: 5; }
+.wp-couple .mark { font-family: var(--dsp); font-weight: 500; letter-spacing: 4px; text-transform: uppercase; font-size: 22px; color: var(--g); }
+.wp-couple .sub { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--lb); }
+.wp-couple nav { display: flex; gap: 2px; margin-top: 8px; overflow-x: auto; }
+.wp-couple nav button { background: none; border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 10px 14px;
+  font: 400 12px var(--bdy); letter-spacing: 1.5px; text-transform: uppercase; color: var(--lb); cursor: pointer; white-space: nowrap; }
+.wp-couple nav button[aria-selected=true] { color: var(--g); border-bottom-color: var(--g); }
+.wp-couple nav button:disabled { opacity: .45; cursor: default; }
+.wp-couple main { max-width: 1040px; margin: 0 auto; padding: 26px 20px 90px; }
+.wp .formframe { width: 100%; height: 75vh; min-height: 520px; border: 1px solid var(--ln); background: #fff; }
+@media (max-width: 600px) { .wp .two { grid-template-columns: 1fr; } .wp h1 { font-size: 32px; } }
+/* Intégration dans l'application : la page du module prend tout l'espace de contenu */
+.wp-page { background: var(--cr); padding: 26px 20px 60px; min-height: 70vh; }
+.wp-page > * { max-width: 1040px; margin-left: auto; margin-right: auto; }
+.wp-page > .wp-toast, .wp-page > .wp-modal { max-width: none; }
+.wp .card.click:hover { box-shadow: none; }

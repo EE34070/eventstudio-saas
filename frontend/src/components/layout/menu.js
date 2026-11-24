@@ -1,5 +1,5 @@
 import { LayoutGrid, Calendar, ClipboardList, Package, Truck, Users, MapPin, Receipt, Wallet, UserCog, TrendingUp, Navigation, Mail, Inbox, Zap, Music, ListTodo, Warehouse, FileText, FileInput, Repeat, LineChart, HeartHandshake, IdCard } from "lucide-react";
-import { Megaphone, Settings, Hammer } from "lucide-react";
+import { Heart, Megaphone, Settings, Hammer } from "lucide-react";
 
 export const PARAMS = { key: "parametres", to: "/parametres", label: "Paramètres", icon: Settings, perm: "users:manage|org:write" };
 
@@ -16,6 +16,7 @@ export const TOP = [
 export const SECTIONS = [
   { key: "operation", cat: "Opération", items: [
     { key: "evenements", to: "/evenements", label: "Événements", icon: Calendar, perm: "events:read" },
+    { key: "mariages", to: "/mariages", label: "Mariages", icon: Heart, perm: "events:read", module: "wedding_planner" },
     { key: "planning", to: "/planning", label: "Planning", icon: ClipboardList, perm: "events:read" },
     { key: "chargement", to: "/chargement", label: "Chargement du jour", icon: Truck, perm: "events:read", badge: "loadings" },
     { key: "livraison", to: "/livraison", label: "Livraison du jour", icon: Navigation, perm: "events:read", badge: "deliveries" },
@@ -54,4 +55,4 @@ export const SECTIONS = [
 
 export const ALL_ITEMS = [...TOP, ...SECTIONS.flatMap((s) => s.items)];
 
-export const GRID = { travaux: "works", communication: "communication", finance: "finance", social: "social", crm: "crm", messagerie: "messages", demandes: "inbound", saisie: "inbound", musique: "music", evenements: "events", planning: "events", chargement: "logistics", livraison: "logistics", logistique: "logistics", todo: "tasks", catalogue: "catalog", entrepots: "stock", vehicules: "vehicles", devis: "quotes", factures: "invoices", contacts: "contacts", lieux: "venues", equipe: "team", "notes-de-frais": "expenses", "factures-achat": "purchases", "a-acheter": "purchases", abonnements: "purchases" };
+export const GRID = { travaux: "works", communication: "communication", finance: "finance", social: "social", crm: "crm", messagerie: "messages", demandes: "inbound", saisie: "inbound", musique: "music", evenements: "events", mariages: "events", planning: "events", chargement: "logistics", livraison: "logistics", logistique: "logistics", todo: "tasks", catalogue: "catalog", entrepots: "stock", vehicules: "vehicles", devis: "quotes", factures: "invoices", contacts: "contacts", lieux: "venues", equipe: "team", "notes-de-frais": "expenses", "factures-achat": "purchases", "a-acheter": "purchases", abonnements: "purchases" };
