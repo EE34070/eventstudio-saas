@@ -17,7 +17,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 import portal_core as po
 import wedding_core as wc
-from core import Ctx, audit, db, need, new_id
+from core import Ctx, audit, current_member, db, need, new_id
 from routes_comms import base_url
 from wedding_seed import (AVAILABLE_SECTIONS, COUPLE_SECTIONS, DEFAULT_OPEN_SECTIONS, DEFAULT_RIGHTS, FICHE_FIELDS, MODULE_LINKS,
                           NOTIFICATION_TYPES)
@@ -684,7 +684,28 @@ async def put_settings(body: SettingsIn, ctx: Ctx = Depends(W_)):
 
 # --- Espace des mariés (portail client) ---------------------------------------------------------------------
 
-async def couple(ctx: Ctx = Depends(_C)) -> tuple:
+PREVIEW_HEADER = "x-view-as-wedding"
+
+
+async def couple(request: Request, member: dict = Depends(current_member)) -> tuple:
+    """Mariés connectés, ou « Voir comme les mariés » : l'équipe (events:read) voit l'espace d'un mariage en lecture seule,
+    sans compte ni identifiants du couple. Les droits du couple s'appliquent à l'identique ; chaque ouverture est journalisée."""
+    wid = request.headers.get(PREVIEW_HEADER)
+    if wid:
+        ctx = await _R(request, member)
+        if request.method != "GET":
+            raise HTTPException(403, "Aperçu : lecture seule")
+        org = await _org(ctx)
+        if wc.MODULE not in (org.get("modules") or []):
+            raise HTTPException(403, "Module Wedding planner non activé")
+        w = await db[wc.W].find_one(ctx.q({"id": wid, "status": {"$ne": "deleted"}}), {"_id": 0})
+        if not w:
+            raise HTTPException(404, "Introuvable")
+        ctx.preview = True
+        if request.url.path.rstrip("/").endswith("/portal/wedding"):
+            await audit(ctx.org_id, member, "wedding_preview", w["id"], f"Aperçu de l'espace des mariés : {wc.names(w['info'])}")
+        return ctx, w, org
+    ctx = await _C(request, member)
     org = await _org(ctx)
     if wc.MODULE not in (org.get("modules") or []) or not ctx.contact_id:
         raise HTTPException(404, "Introuvable")
@@ -715,18 +736,20 @@ async def portal_home(c=Depends(couple)):
                "sections": COUPLE_SECTIONS, "open_sections": w.get("open_sections", DEFAULT_OPEN_SECTIONS),
                "steps": {"info": "complete" if complete else "todo", "quest": q.get("status", "pending"), "quest_submitted_at": q.get("submitted_at")},
                "events": [{"key": e["key"], "name": e["name"], "date": e.get("date")} for e in w.get("events", []) if e.get("enabled")],
-               "can_edit_info": _rights(w)["edit_info"] and not ctx.preview, "design": {**DESIGN, "app_name": org.get("name"), **(org.get("wp_branding") or {})}})
+               "can_edit_info": _rights(w)["edit_info"] and not ctx.preview, "preview": ctx.preview, "design": {**DESIGN, "app_name": org.get("name"), **(org.get("wp_branding") or {})}})
 
 
 @router.get("/portal/wedding/info")
 async def portal_info(c=Depends(couple)):
-    _, w, _ = c
-    return {"info": _public_info(w), "can_edit": _rights(w)["edit_info"], "budget_visible": _rights(w)["budget"]}
+    ctx, w, _ = c
+    return {"info": _public_info(w), "can_edit": _rights(w)["edit_info"] and not ctx.preview, "budget_visible": _rights(w)["budget"]}
 
 
 @router.put("/portal/wedding/info")
 async def portal_put_info(body: Info, c=Depends(couple)):
     ctx, w, _ = c
+    if ctx.preview:
+        raise HTTPException(403, "Aperçu : lecture seule")
     if not _rights(w)["edit_info"]:
         raise HTTPException(403, "La modification de la fiche n'est pas ouverte pour le moment")
     new, old = body.clean(), w["info"]
@@ -751,7 +774,7 @@ async def portal_questionnaire(c=Depends(couple)):
     resp = s.get("responder_uri") or s.get("form_url")
     q = w.get("questionnaire") or {}
     return _j({"status": q.get("status", "pending"), "submitted_at": q.get("submitted_at"), "embed_url": wc.prefilled_url(resp, qs, w["info"]),
-               "open_url": resp, "known_fields": wc.known_fields(w["info"])})
+               "open_url": resp, "known_fields": wc.known_fields(w["info"]), "preview": ctx.preview})
 
 
 @router.get("/portal/wedding/food/{key}")

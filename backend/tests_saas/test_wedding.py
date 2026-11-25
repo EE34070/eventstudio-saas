@@ -8,7 +8,7 @@ import portal_core as po
 import tenant_router as tenants
 import wedding_core as wc
 from conftest import ORG_A, ORG_B
-from core import Ctx
+from core import Ctx, db
 
 API = "/api/wedding"
 
@@ -224,3 +224,22 @@ async def test_events_rules(client, as_user, setup):
     evs = [e for e in evs if e["key"] != "br"]
     w2 = (await client.put(f"{API}/weddings/{w['id']}/events", json={"events": evs}, headers=as_user("alice"))).json()
     assert "br" not in [e["key"] for e in w2["events"]]
+
+
+async def test_preview_as_couple(client, as_user, setup, platform):
+    """« Voir comme les mariés » : lecture seule, sans compte du couple, mêmes droits, journalisé, cloisonné."""
+    w = await make(client, as_user)
+    rights = (await client.get(f"{API}/weddings/{w['id']}", headers=as_user("alice"))).json()["rights"]
+    await client.put(f"{API}/weddings/{w['id']}/rights", json={**rights, "budget": False}, headers=as_user("alice"))
+    pv = {**as_user("alice"), "x-view-as-wedding": w["id"]}
+    home = (await client.get("/api/portal/wedding", headers=pv)).json()
+    assert home["preview"] is True and home["can_edit_info"] is False and home["names"]
+    info = (await client.get("/api/portal/wedding/info", headers=pv)).json()
+    assert info["can_edit"] is False and info["info"]["budget"] is None
+    assert (await client.get("/api/portal/wedding/questionnaire", headers=pv)).status_code == 200
+    assert (await client.put("/api/portal/wedding/info", json=info["info"], headers=pv)).status_code == 403
+    assert (await client.get("/api/portal/wedding", headers={**as_user("bob"), "x-view-as-wedding": w["id"]})).status_code in (403, 404)
+    assert (await client.get("/api/portal/wedding", headers={**as_user("alice"), "x-view-as-wedding": "inconnu"})).status_code == 404
+    tenants.pin_org(ORG_A)
+    logs = await db.audit_logs.find({"action": "wedding_preview"}).to_list(10)
+    assert len(logs) == 1 and logs[0]["target"] == w["id"]
