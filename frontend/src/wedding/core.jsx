@@ -5,11 +5,16 @@ import "./wp.css";
 
 /* Module Wedding planner : client API, thème (design validé par l'organisatrice), petits composants. */
 
-export const get = (p) => api.get(p).then((r) => r.data);
-export const send = (method, p, body) => api.request({ method, url: p, data: body }).then((r) => r.data);
+/** « Voir comme les mariés » : tant qu'un aperçu est ouvert, les appels de l'espace des mariés portent l'identifiant du mariage (lecture seule côté serveur). */
+let previewId = null;
+export const setPreview = (id) => { previewId = id || null; };
+const pv = (p) => (previewId && p.startsWith("/portal/wedding") ? { headers: { "x-view-as-wedding": previewId } } : {});
+
+export const get = (p) => api.get(p, pv(p)).then((r) => r.data);
+export const send = (method, p, body) => api.request({ method, url: p, data: body, ...pv(p) }).then((r) => r.data);
 
 export function useWq(key, path, opts = {}) {
-  return useQuery({ queryKey: ["wp", ...key], queryFn: () => get(path), staleTime: 0, ...opts });
+  return useQuery({ queryKey: ["wp", previewId, ...key], queryFn: () => get(path), staleTime: 0, ...opts });
 }
 
 /** Mutation qui rafraîchit tout le module : une seule saisie, visible partout. */

@@ -62,11 +62,11 @@ function OurQuestionnaire({ lang }) {
       <div className="kicker">{c.s2}</div><h1>{c.qt}</h1><p>{c.qp}</p>
       <div className="row" style={{ margin: "10px 0" }}>
         {data.status === "submitted" && <span className="pill ok">{c.qdone}{data.submitted_at ? ` · ${new Date(data.submitted_at).toLocaleDateString(lang === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "long" })}` : ""}</span>}
-        {data.open_url && <a className="btn ghost" href={data.open_url} target="_blank" rel="noreferrer">{c.edit}</a>}
+        {data.open_url && !data.preview && <a className="btn ghost" href={data.open_url} target="_blank" rel="noreferrer">{c.edit}</a>}
       </div>
       {data.known_fields.length > 0 && <div className="note">{c.known} {data.known_fields.map((k) => c.knownLabels[k] ?? k).join(", ")}.</div>}
       {data.embed_url
-        ? <iframe className="formframe" src={data.embed_url} title={c.qh} />
+        ? <iframe className="formframe" src={data.embed_url} title={c.qh} style={data.preview ? { pointerEvents: "none" } : undefined} tabIndex={data.preview ? -1 : undefined} />
         : <div className="empty"><h3>{c.qh}</h3><p>{c.qnone}</p></div>}
       <div className="note">{c.qn}</div>
     </div>
@@ -130,7 +130,7 @@ export default function CoupleSpace({ home: h, onClassic, onAccount }) {
     <div className="wp wp-couple" style={designVars(d)} data-testid="wedding-couple">
       <header>
         <div className="row spread"><div className="mark">{d.app_name}</div>
-          <div className="row"><button className="btn ghost small" onClick={onClassic}>{h.lang === "en" ? "Documents & messages" : "Documents et messages"}</button><button className="btn ghost small" onClick={onAccount}>{h.lang === "en" ? "My account" : "Mon compte"}</button></div></div>
+          {!h.preview && <div className="row"><button className="btn ghost small" onClick={onClassic}>{h.lang === "en" ? "Documents & messages" : "Documents et messages"}</button><button className="btn ghost small" onClick={onAccount}>{h.lang === "en" ? "My account" : "Mon compte"}</button></div>}</div>
         <div className="sub">{h.names}</div>
         <nav role="tablist">
           {h.sections.map((s) => { const open = h.open_sections.includes(s); return <button key={s} role="tab" aria-selected={tab === s} disabled={!open} onClick={() => setTab(s)} title={open ? undefined : C[h.lang].soon}>{ml(s, h.lang)}</button>; })}

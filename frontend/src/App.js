@@ -63,6 +63,7 @@ const Relances = lazy(() => import("@/pages/Relances"));
 const Mariages = lazy(() => import("@/wedding/Dashboard"));
 const MariageDossier = lazy(() => import("@/wedding/WeddingFile"));
 const MariagesReglages = lazy(() => import("@/wedding/Settings"));
+const MariageApercu = lazy(() => import("@/wedding/Preview"));
 
 const SOON = ["compta", "commercial", "documents", "ecrans"];
 
@@ -130,7 +131,7 @@ function Gate() {
         <Route path="mon-espace" element={<MonEspace />} />
         {can("comms:view") && <Route path="communication" element={<Communication />} />}
         <Route path="musique-plans" element={<Musique />} />
-        {modules.includes("wedding_planner") && can("events:read") && <><Route path="mariages" element={<Mariages />} /><Route path="mariages/reglages" element={<MariagesReglages />} /><Route path="mariages/:id" element={<MariageDossier />} /></>}
+        {modules.includes("wedding_planner") && can("events:read") && <><Route path="mariages" element={<Mariages />} /><Route path="mariages/reglages" element={<MariagesReglages />} /><Route path="mariages/:id" element={<MariageDossier />} /><Route path="mariages/:id/apercu" element={<MariageApercu />} /></>}
         {can("providers:manage") && <Route path="staff" element={<StaffAdmin />} />}
         {can("providers:manage") && <Route path="dj" element={<DjAdmin />} />}
         {(can("users:manage") || can("org:write")) && <Route path="parametres" element={<Parametres />} />}

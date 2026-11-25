@@ -196,6 +196,8 @@ function AccountTab({ w }) {
             {p.email && p.status !== "accepted" && <div style={{ marginTop: 8 }}><button className="btn ghost small" onClick={() => invite.mutate(p.index)}>{p.status === "pending" ? "Renvoyer l'invitation" : "Envoyer l'invitation"}</button></div>}</div>); })}</div>
         {link && <div className="note">E-mail non envoyé automatiquement (messagerie non connectée ou hors production). Lien personnel à transmettre : <input readOnly value={link} onFocus={(e) => e.target.select()} style={{ marginTop: 6 }} /></div>}
       </Section>
+      <Section title="Aperçu"><p>Ouvrez l'espace du couple tel qu'il le voit, avec ces droits et ces rubriques, en lecture seule. Aucun identifiant n'est nécessaire et le couple n'a pas besoin d'être connecté.</p>
+        <Link className="btn" to={`/mariages/${w.id}/apercu`}>Voir comme les mariés</Link></Section>
       <Section title="Langue de l'espace du couple"><p>Tout l'espace s'adapte : menus, textes, formulaires et e-mails.</p>
         <select value={data.lang} aria-label="Langue de l'espace des mariés" onChange={(e) => lang.mutate(e.target.value)}><option value="fr">Français</option><option value="en">Anglais</option></select></Section>
       <Section title="Ce que le couple peut voir">{RIGHTS.map(([k, l]) => <label key={k} className="tog"><span>{l}</span><input type="checkbox" checked={data.rights[k]} onChange={(e) => rights.mutate({ ...data.rights, [k]: e.target.checked })} /></label>)}</Section>
@@ -221,7 +223,8 @@ export default function WeddingFile() {
       {error && <p>Mariage introuvable.</p>}
       {w && (<>
         <div className="kicker">{w.info.date ? `${fmtDate(w.info.date)} · ${w.days_left} jours` : "Date à définir"}</div>
-        <h1>{w.names}</h1>
+        <div className="row spread"><h1>{w.names}</h1>
+          <Link className="btn ghost" to={`/mariages/${w.id}/apercu`} data-testid="wedding-preview-btn">Voir comme les mariés</Link></div>
         <div className="row" style={{ margin: "16px 0" }} role="tablist">
           {TABS.map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} className={`btn${tab === k ? "" : " ghost"}`} onClick={() => setSp({ onglet: k }, { replace: true })} data-testid={`wedding-tab-${k}`}>{l}{k === "quest" && w.discrepancies.length > 0 ? ` (${w.discrepancies.length})` : ""}</button>)}
         </div>
